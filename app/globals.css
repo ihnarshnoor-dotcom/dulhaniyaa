@@ -1,26 +1,134 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Brand colours — change these to re-theme the whole site. */
+@theme {
+  --color-primary: #a52a2a; /* buttons, links, accents */
+  --color-primary-dark: #861f1f; /* primary hover */
+  --color-secondary: #edd4d4; /* lighter shade of primary, for secondary buttons */
+  --color-secondary-dark: #e4c2c2; /* secondary hover */
+  --color-ivory: #fef9f3; /* page background */
+  --color-ink: #2b1d1a;
+  --color-muted: #6e5f58;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ivory);
+  color: var(--color-ink);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--color-secondary);
+  color: var(--color-primary-dark);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* Home hero entrance */
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+.hero-fade {
+  animation: hero-fade 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Budget calculator: each new step slides in */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+.step-in {
+  animation: step-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Budget calculator: tick badge pops in when an option is chosen */
+@keyframes pop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+}
+.pop {
+  animation: pop 0.3s ease-out both;
+}
+
+/* Photo preview: backdrop fades in, photo grows in */
+@keyframes preview-in {
+  from {
+    opacity: 0;
+  }
+}
+.preview-in {
+  animation: preview-in 0.25s ease-out both;
+}
+@keyframes photo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.photo-in {
+  animation: photo-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Loading placeholders */
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(90deg, rgb(43 29 26 / 0.06) 25%, rgb(43 29 26 / 0.12) 50%, rgb(43 29 26 / 0.06) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade,
+  .step-in,
+  .pop,
+  .shimmer,
+  .preview-in,
+  .photo-in {
+    animation: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }
