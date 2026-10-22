@@ -21,6 +21,7 @@ function fallbackMessage(status: number) {
   if (status === 401) return "Please log in again.";
   if (status === 404) return "We couldn't find that.";
   if (status === 413) return "That file is too large.";
+  if (status === 429) return "Too many requests. Please wait a moment and try again.";
   if (status >= 500) return "Something went wrong on our side. Please try again.";
   return "Something went wrong. Please try again.";
 }
