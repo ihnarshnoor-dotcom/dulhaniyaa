@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { clearToken, getToken, setToken, TOKEN_KEY } from "@/lib/authStorage";
 import * as api from "@/lib/photosApi";
 import { normalizePhone } from "@/lib/authSchemas";
@@ -111,8 +111,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+const noSubscribe = () => () => {};
+
 export function useAuth() {
   const value = useContext(AuthContext);
   if (!value) throw new Error("useAuth must be used inside <AuthProvider>");
-  return value;
+  // While a component hydrates, give it what the server rendered: the session still loading.
+  // Parts of the page inside <Suspense> (like the header) hydrate later, and the saved session
+  // may already be restored by then; without this their HTML wouldn't match the server's.
+  // Right after hydrating, React re-renders them with the real session.
+  const hydrated = useSyncExternalStore(noSubscribe, () => true, () => false);
+  return useMemo(
+    () => (hydrated ? value : { ...value, user: null, loading: api.isPhotosApiEnabled, signedOut: false }),
+    [hydrated, value],
+  );
 }
