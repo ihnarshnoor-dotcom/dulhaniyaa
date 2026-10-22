@@ -2,24 +2,24 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Container } from "@/components/ui/Container";
-import { SharedPhoto, SharedPhotoSkeleton } from "@/components/share/SharedPhoto";
+import { SharedLink, SharedLinkSkeleton } from "@/components/share/SharedLink";
 import { isPhotosApiEnabled } from "@/lib/photosApi";
 
 export const metadata: Metadata = {
-  title: "A photo shared with you",
-  description: "A wedding photo shared from Dulhaniyaa's Photogram.",
-  // Share links are private-ish and expire, so keep them out of search results.
+  title: "Shared with you",
+  description: "Wedding photos shared from Dulhaniyaa's Photogram.",
+  // Share links are private-ish and can be switched off, so keep them out of search results.
   robots: { index: false, follow: false },
 };
 
-/** Where a share link (and its QR code) lands. No login needed: the token is the permission. */
-export default function SharedPhotoPage({ params }: PageProps<"/s/[token]">) {
+/** Where a share link (and its QR code) lands: one photo or a collection. No login needed: the token is the permission. */
+export default function SharedLinkPage({ params }: PageProps<"/s/[token]">) {
   if (!isPhotosApiEnabled) notFound();
 
   return (
     <section className="pt-12 pb-24 sm:pt-16 sm:pb-32">
       <Container>
-        <Suspense fallback={<SharedPhotoSkeleton />}>{params.then(({ token }) => <SharedPhoto token={token} />)}</Suspense>
+        <Suspense fallback={<SharedLinkSkeleton />}>{params.then(({ token }) => <SharedLink token={token} />)}</Suspense>
       </Container>
     </section>
   );

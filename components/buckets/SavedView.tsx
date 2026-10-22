@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Photo } from "@/data/site";
 import { PhotoPreview } from "@/components/photogram/PhotoPreview";
+import { ShareCollection } from "@/components/share/ShareCollection";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { CloseIcon, SearchIcon } from "@/components/ui/Icons";
 import { categoryLabel } from "@/lib/photoCategories";
@@ -191,33 +192,42 @@ export function SavedView() {
         </div>
       )}
 
-      {/* Search */}
-      <form role="search" onSubmit={(e) => e.preventDefault()} className="relative mt-6 max-w-md">
-        <label htmlFor="saved-search" className="sr-only">
-          Search {currentBucket ? `in ${currentBucket.name}` : "your saved photos"}
-        </label>
-        <SearchIcon className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted" />
-        <input
-          id="saved-search"
-          type="search"
-          value={queryInput}
-          onChange={(e) => setQueryInput(e.target.value)}
-          maxLength={MAX_QUERY_LENGTH}
-          placeholder={currentBucket ? `Search in ${currentBucket.name}…` : "Search saved photos…"}
-          autoComplete="off"
-          className="block min-h-12 w-full rounded-full border border-ink/15 bg-white/60 py-3 pr-12 pl-11 text-base text-ink placeholder:text-muted/60 focus:border-primary focus:ring-2 focus:ring-primary/15 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
-        />
-        {queryInput && (
-          <button
-            type="button"
-            onClick={() => setQueryInput("")}
-            aria-label="Clear search"
-            className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-secondary/60"
-          >
-            <CloseIcon width={16} height={16} />
-          </button>
+      {/* Search, and sharing for the open collection */}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <form role="search" onSubmit={(e) => e.preventDefault()} className="relative w-full max-w-md">
+          <label htmlFor="saved-search" className="sr-only">
+            Search {currentBucket ? `in ${currentBucket.name}` : "your saved photos"}
+          </label>
+          <SearchIcon className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted" />
+          <input
+            id="saved-search"
+            type="search"
+            value={queryInput}
+            onChange={(e) => setQueryInput(e.target.value)}
+            maxLength={MAX_QUERY_LENGTH}
+            placeholder={currentBucket ? `Search in ${currentBucket.name}…` : "Search saved photos…"}
+            autoComplete="off"
+            className="block min-h-12 w-full rounded-full border border-ink/15 bg-white/60 py-3 pr-12 pl-11 text-base text-ink placeholder:text-muted/60 focus:border-primary focus:ring-2 focus:ring-primary/15 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+          />
+          {queryInput && (
+            <button
+              type="button"
+              onClick={() => setQueryInput("")}
+              aria-label="Clear search"
+              className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:bg-secondary/60"
+            >
+              <CloseIcon width={16} height={16} />
+            </button>
+          )}
+        </form>
+        {currentBucket && (
+          <ShareCollection
+            key={currentBucket.id}
+            bucket={currentBucket}
+            thumbnail={stale ? null : (photos[0]?.thumb_url ?? photos[0]?.url)}
+          />
         )}
-      </form>
+      </div>
 
       {/* Photos */}
       <div className="mt-8" aria-busy={result === null || stale}>

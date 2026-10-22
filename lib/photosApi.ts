@@ -10,7 +10,7 @@
 import { clearToken, getToken } from "./authStorage";
 import { errorFromResponse, NETWORK_MESSAGE, PhotosApiError } from "./photosApiErrors";
 import { buildQuery, type FeedFilters } from "./photoSearch";
-import { shareExpiry, sharedPhotoOf } from "./share";
+import { sharedLinkOf, shareRequestBody, type SharedLink, type ShareTarget } from "./share";
 
 export { PhotosApiError, friendlyMessage } from "./photosApiErrors";
 
@@ -248,11 +248,12 @@ export async function searchSaved(
 /* ───────────── Share links ───────────── */
 
 /**
- * Makes a link to one photo that stops working after 3 days. Only share public photos: the backend
- * also accepts the user's own private ones, so callers must check `visibility` first.
+ * Makes a link to one photo (expires after 3 days) or one of the user's collections (lasts until
+ * revoked). Only share public photos: the backend also accepts the user's own private ones, so
+ * callers must check `visibility` first.
  */
-export const createPhotoShare = (imageId: string) =>
-  request<{ token: string; url: string }>("/share", { method: "POST", body: { imageId, expiresAt: shareExpiry() }, auth: true });
+export const createShare = (target: ShareTarget) =>
+  request<{ token: string; url: string }>("/share", { method: "POST", body: shareRequestBody(target), auth: true });
 
 /** Switches off one of the signed-in user's links. */
 export const revokeShare = async (token: string) => {
@@ -260,11 +261,11 @@ export const revokeShare = async (token: string) => {
 };
 
 /**
- * The photo behind a share link. No login needed. 404 when the link is unknown, expired or switched off.
- * Each call counts as a view, so don't poll it.
+ * What a share link shows: one photo, or a collection's name and photos. No login needed.
+ * 404 when the link is unknown, expired or switched off. Each call counts as a view, so don't poll it.
  */
-export async function getSharedPhoto(token: string, signal?: AbortSignal): Promise<ApiPhoto> {
-  const photo = sharedPhotoOf(await request<unknown>(`/share/${encodeURIComponent(token)}`, { signal }));
-  if (!photo) throw new PhotosApiError(404, "We couldn't find that.");
-  return photo;
+export async function getShare(token: string, signal?: AbortSignal): Promise<SharedLink> {
+  const link = sharedLinkOf(await request<unknown>(`/share/${encodeURIComponent(token)}`, { signal }));
+  if (!link) throw new PhotosApiError(404, "We couldn't find that.");
+  return link;
 }
