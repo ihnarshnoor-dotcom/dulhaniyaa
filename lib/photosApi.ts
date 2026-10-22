@@ -190,6 +190,20 @@ export const setVisibility = async (id: string, visibility: Visibility) => {
   });
 };
 
+/**
+ * Deletes one of the signed-in user's photos. The backend also removes it from saved
+ * collections and stops its share links. A 404 means it is already gone, which counts as done.
+ * 401 ends the session (handled by `request`); other errors, such as 429, are thrown.
+ */
+export async function deleteImage(id: string): Promise<void> {
+  try {
+    await request<void>(`/images/${encodeURIComponent(id)}`, { method: "DELETE", auth: true });
+  } catch (err) {
+    if (err instanceof PhotosApiError && err.status === 404) return;
+    throw err;
+  }
+}
+
 /* ───────────── Buckets & saved photos ───────────── */
 
 /** The signed-in user's buckets, oldest first. */

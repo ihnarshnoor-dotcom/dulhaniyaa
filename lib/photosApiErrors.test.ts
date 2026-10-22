@@ -14,6 +14,7 @@ describe("errorFromResponse", () => {
     [401, {}, "Please log in again."],
     [404, { error: "" }, "We couldn't find that."],
     [413, "Payload Too Large", "That file is too large."],
+    [429, { error: "" }, "Too many requests. Please wait a moment and try again."],
     [500, { error: 42 }, "Something went wrong on our side. Please try again."],
     [418, undefined, "Something went wrong. Please try again."],
   ])("falls back to a readable message for %i with body %j", (status, body, message) => {
