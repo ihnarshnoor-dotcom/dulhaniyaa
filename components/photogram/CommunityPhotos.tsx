@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Photo } from "@/data/site";
 import { SaveToBucket } from "@/components/buckets/SaveToBucket";
+import { SharePhoto } from "@/components/share/SharePhoto";
 import { buttonClasses } from "@/components/ui/Button";
 import { CloseIcon, SearchIcon } from "@/components/ui/Icons";
 import { categoryLabel, photoCategories } from "@/lib/photoCategories";
@@ -331,7 +332,14 @@ function CommunityFeed() {
           index={Math.min(openIndex, photos.length - 1)}
           onClose={close}
           onChange={setOpenIndex}
-          actions={(i) => photos[i] && <SaveToBucket key={photos[i].id} photo={photos[i]} variant="labelled" />}
+          actions={(i) =>
+            photos[i] && (
+              <>
+                <SaveToBucket key={`save-${photos[i].id}`} photo={photos[i]} variant="labelled" />
+                <SharePhoto key={`share-${photos[i].id}`} photo={photos[i]} variant="labelled" />
+              </>
+            )
+          }
         />
       )}
     </section>

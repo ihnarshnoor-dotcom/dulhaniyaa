@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SaveToBucket } from "@/components/buckets/SaveToBucket";
+import { SharePhoto } from "@/components/share/SharePhoto";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { TrashIcon } from "@/components/ui/Icons";
 import { categoryLabel } from "@/lib/photoCategories";
@@ -191,16 +192,19 @@ export function MyUploads() {
                   <p className="truncate text-sm font-medium text-ink" title={photoAlt(photo)}>
                     {photo.title || categoryLabel(photo.category)}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setToDelete(photo)}
-                    disabled={busyId !== null}
-                    aria-label={`Delete "${photoAlt(photo)}"`}
-                    title="Delete photo"
-                    className="grid size-8 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
-                  >
-                    <TrashIcon width={16} height={16} />
-                  </button>
+                  <div className="flex shrink-0 items-center">
+                    <SharePhoto photo={photo} />
+                    <button
+                      type="button"
+                      onClick={() => setToDelete(photo)}
+                      disabled={busyId !== null}
+                      aria-label={`Delete "${photoAlt(photo)}"`}
+                      title="Delete photo"
+                      className="grid size-8 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+                    >
+                      <TrashIcon width={16} height={16} />
+                    </button>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between gap-2 text-xs text-muted">
                   <span>{busy ? "Saving…" : "Show on Photogram"}</span>
