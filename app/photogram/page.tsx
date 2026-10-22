@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { gallery } from "@/data/site";
 import { Container } from "@/components/ui/Container";
 import { PhotoBento } from "@/components/photogram/PhotoBento";
+import { CommunityPhotos } from "@/components/photogram/CommunityPhotos";
 
 export const metadata: Metadata = {
   title: "Photogram: Our Favourite Wedding Moments",
@@ -21,6 +22,7 @@ export default function PhotogramPage() {
           </p>
         </div>
         <PhotoBento photos={gallery} />
+        <CommunityPhotos />
       </Container>
     </section>
   );

@@ -8,12 +8,17 @@
  */
 
 // Trailing slashes are trimmed: "…app/" + "/api" would become "//api", which the server redirects and the browser blocks.
-const BASE = (process.env.NEXT_PUBLIC_API_URL ?? "https://facilitator-five.vercel.app").replace(/\/+$/, "");
+const BASE = process.env.FACILITATOR_URL;
 
 /* ───────────── Rate card (/services) ───────────── */
 
 export type Level = "core" | "addon" | "luxury";
-export type PricingType = "flat" | "per_guest" | "per_event" | "per_day" | "on_request";
+export type PricingType =
+  | "flat"
+  | "per_guest"
+  | "per_event"
+  | "per_day"
+  | "on_request";
 
 export type ServiceItem = {
   id: string;
@@ -97,7 +102,11 @@ export const getServices = () => request<RateCard>("/api/dulhaniyaa/services");
 export async function getPlan(basics: Basics, selectedIds: string[]) {
   const started = performance.now();
   const seconds = () => `${((performance.now() - started) / 1000).toFixed(1)}s`;
-  console.log("[AI] Plan request sent", { basics, services: selectedIds.length, selectedIds });
+  console.log("[AI] Plan request sent", {
+    basics,
+    services: selectedIds.length,
+    selectedIds,
+  });
   try {
     const plan = await request<Plan>("/api/dulhaniyaa/plan", {
       method: "POST",
@@ -106,9 +115,13 @@ export async function getPlan(basics: Basics, selectedIds: string[]) {
     console.log(`[AI] Plan received in ${seconds()}`, plan);
     return plan;
   } catch (err) {
-    console.error(`[AI] Plan failed after ${seconds()}:`, err instanceof Error ? err.message : err);
+    console.error(
+      `[AI] Plan failed after ${seconds()}:`,
+      err instanceof Error ? err.message : err,
+    );
     throw err;
   }
 }
 
-export const itemRefName = (ref: ItemRef) => (typeof ref === "string" ? ref : ref.name);
+export const itemRefName = (ref: ItemRef) =>
+  typeof ref === "string" ? ref : ref.name;

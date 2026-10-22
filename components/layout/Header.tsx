@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { navLinks } from "@/data/site";
+import { b2b, headerLinks } from "@/data/site";
 import { buttonClasses } from "@/components/ui/Button";
 import { MenuIcon } from "@/components/ui/Icons";
+import { B2BMenu } from "./B2BMenu";
+import { HeaderAuth } from "./HeaderAuth";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 
 // The logo already links home.
-const desktopLinks = navLinks.filter((link) => link.href !== "/");
+const desktopLinks = headerLinks.filter((link) => link.href !== "/");
 
 export function Header() {
   const pathname = usePathname();
@@ -28,14 +30,17 @@ export function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 border-b bg-ivory/90 backdrop-blur-md transition-colors duration-300 ${
+        className={`sticky top-0 z-40 border-b bg-ivory/65 backdrop-blur-md transition-colors duration-300 ${
           scrolled ? "border-ink/10" : "border-transparent"
         }`}
       >
-        <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-4 sm:h-20 sm:px-6">
+        <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-4 sm:h-20 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:justify-items-start">
           <Logo />
 
-          <nav aria-label="Main" className="hidden items-center gap-7 lg:flex">
+          <nav
+            aria-label="Main"
+            className="hidden items-center gap-7 lg:flex lg:justify-self-center"
+          >
             {desktopLinks.map((link) => {
               const active = pathname.startsWith(link.href);
               return (
@@ -51,15 +56,20 @@ export function Header() {
                 </Link>
               );
             })}
+            <B2BMenu active={pathname.startsWith(b2b.href)} />
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 lg:justify-self-end">
             <Link
-              href="/budget-calculator"
-              className={buttonClasses("primary", "min-h-10 px-5 py-2 whitespace-nowrap max-sm:hidden!")}
+              href="/plan-my-wedding"
+              className={buttonClasses(
+                "primary",
+                "min-h-10 px-5 py-2 whitespace-nowrap max-sm:hidden!",
+              )}
             >
-              Plan my budget
+              Plan my wedding
             </Link>
+            <HeaderAuth />
             <button
               type="button"
               onClick={() => setMenuOpen(true)}

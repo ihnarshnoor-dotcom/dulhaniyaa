@@ -199,7 +199,7 @@ export function PlanResult({
           <ol className="relative space-y-5 border-l-2 border-secondary pl-6">
             {plan.timeline.map((t, i) => (
               <li key={i} className="relative">
-                <span className="absolute top-1.5 -left-[31px] size-3 rounded-full bg-primary ring-4 ring-secondary" />
+                <span className="absolute top-1.5 left-[-31px] size-3 rounded-full bg-primary ring-4 ring-secondary" />
                 <p className="text-xs font-medium tracking-wide text-primary uppercase">{t.when}</p>
                 <p className="mt-0.5 text-ink/80">{t.task}</p>
               </li>

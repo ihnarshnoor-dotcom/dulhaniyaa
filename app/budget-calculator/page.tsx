@@ -15,7 +15,7 @@ export default function BudgetCalculatorPage() {
   return (
     <div className="relative isolate overflow-hidden">
       {/* Soft, blurred wedding photo behind the calculator */}
-      <div className="absolute inset-x-0 top-0 -z-10 h-[34rem]" aria-hidden>
+      <div className="absolute inset-x-0 top-0 -z-10 h-136" aria-hidden>
         <Image
           src={images.hero.src}
           alt=""
@@ -24,7 +24,7 @@ export default function BudgetCalculatorPage() {
           sizes="100vw"
           className="scale-110 object-cover blur-2xl"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ivory/40 via-ivory/70 to-ivory" />
+        <div className="absolute inset-0 bg-linear-to-b from-ivory/40 via-ivory/70 to-ivory" />
       </div>
 
       <Container className="max-w-4xl pt-14 pb-24 sm:pt-20 sm:pb-32">

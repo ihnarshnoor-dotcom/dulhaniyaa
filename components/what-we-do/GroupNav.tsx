@@ -33,8 +33,8 @@ export function GroupNav({ groups }: Props) {
   }, [groups]);
 
   return (
-    <nav aria-label="Service groups" className="sticky top-[4.5rem] z-30 py-3 sm:top-20">
-      <ol ref={list} className="relative mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full border border-white/60 bg-white/60 p-1.5 shadow-lg shadow-primary/5 backdrop-blur-xl [scrollbar-width:none]">
+    <nav aria-label="Service groups" className="sticky top-18 z-30 py-3 sm:top-20">
+      <ol ref={list} className="relative mx-auto flex w-fit max-w-full gap-1 overflow-x-auto rounded-full border border-white/60 bg-white/60 p-1.5 shadow-lg shadow-primary/5 backdrop-blur-xl scrollbar-none">
         {groups.map((g, i) => (
           <li key={g.id} className="shrink-0">
             <a

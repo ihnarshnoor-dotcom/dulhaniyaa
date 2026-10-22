@@ -2,13 +2,21 @@
 
 import Link from "next/link";
 import { useEffect, useLayoutEffect } from "react";
-import { business, navLinks } from "@/data/site";
+import { b2b, business, headerLinks } from "@/data/site";
 import { buttonClasses } from "@/components/ui/Button";
 import { CloseIcon } from "@/components/ui/Icons";
 import { whatsappLink } from "@/lib/whatsapp";
 import { Logo } from "./Logo";
+import { MobileAuth } from "./MobileAuth";
 
 type Props = { open: boolean; onClose: () => void; pathname: string };
+
+// Soft ease-out, the same curve as the site's other entrance animations.
+const ease = "ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none";
+// Each item fades up a little, one after another; on close they all fade together.
+const item = (open: boolean) =>
+  `transition-[opacity,translate] duration-500 ${ease} ${open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"}`;
+const delay = (open: boolean, step: number) => ({ transitionDelay: open ? `${80 + step * 45}ms` : "0ms" });
 
 export function MobileMenu({ open, onClose, pathname }: Props) {
   // Lock page scroll and allow closing with Escape while the menu is open.
@@ -33,8 +41,11 @@ export function MobileMenu({ open, onClose, pathname }: Props) {
       role="dialog"
       aria-modal="true"
       aria-label="Menu"
-      hidden={!open}
-      className="fixed inset-0 z-50 flex flex-col bg-ivory text-ink lg:hidden"
+      // Stays rendered so it can animate out; `inert` + `invisible` keep it out of reach while closed.
+      inert={!open}
+      className={`fixed inset-0 z-50 flex flex-col bg-ivory text-ink transition-[opacity,visibility,translate] duration-300 lg:hidden ${ease} ${
+        open ? "visible translate-y-0 opacity-100" : "pointer-events-none invisible -translate-y-2 opacity-0"
+      }`}
     >
       <div className="flex h-18 items-center justify-between px-4">
         <Logo onNavigate={onClose} />
@@ -49,7 +60,7 @@ export function MobileMenu({ open, onClose, pathname }: Props) {
       </div>
 
       <nav aria-label="Mobile" className="flex flex-1 flex-col justify-center gap-2 px-6">
-        {navLinks.map((link) => {
+        {headerLinks.map((link, i) => {
           const active = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
           return (
             <Link
@@ -57,17 +68,28 @@ export function MobileMenu({ open, onClose, pathname }: Props) {
               href={link.href}
               onNavigate={onClose}
               aria-current={active ? "page" : undefined}
-              className={`py-2 font-serif text-4xl ${active ? "text-primary" : "text-ink"}`}
+              style={delay(open, i)}
+              className={`py-2 font-serif text-4xl ${active ? "text-primary" : "text-ink"} ${item(open)}`}
             >
               {link.label}
             </Link>
           );
         })}
+        <Link
+          href={b2b.href}
+          onNavigate={onClose}
+          aria-current={pathname.startsWith(b2b.href) ? "page" : undefined}
+          style={delay(open, headerLinks.length)}
+          className={`py-2 font-serif text-4xl ${pathname.startsWith(b2b.href) ? "text-primary" : "text-ink"} ${item(open)}`}
+        >
+          {b2b.label}
+        </Link>
       </nav>
 
-      <div className="flex flex-col gap-3 px-6 pb-10">
-        <Link href="/budget-calculator" onNavigate={onClose} className={buttonClasses("primary")}>
-          Plan my budget
+      <div style={delay(open, headerLinks.length + 1)} className={`flex flex-col gap-3 px-6 pb-10 ${item(open)}`}>
+        <MobileAuth onNavigate={onClose} />
+        <Link href="/plan-my-wedding" onNavigate={onClose} className={buttonClasses("primary")}>
+          Plan my wedding
         </Link>
         <div className="grid grid-cols-2 gap-3">
           <a

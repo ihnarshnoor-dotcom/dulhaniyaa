@@ -44,6 +44,7 @@ import {
   ServicesStep,
   VibeStep,
 } from "./Steps";
+import { clearHandoff, readHandoff } from "@/lib/plannerHandoff";
 
 const steps = [
   { id: "events", label: "Events", icon: CalendarHeart },
@@ -104,6 +105,19 @@ export function BudgetCalculator() {
   }, [cardAttempt]);
 
   useEffect(() => () => clearTimeout(advanceTimer.current), []);
+
+  // Events added in "Plan my wedding" arrive through sessionStorage. Applied after hydration
+  // (the server can't see sessionStorage), then cleared so a later visit starts fresh.
+  useEffect(() => {
+    const handoff = readHandoff();
+    if (!handoff) return;
+    const frame = requestAnimationFrame(() => {
+      setEvents(handoff);
+      setStep(1);
+      clearHandoff();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   // Keep the top of the calculator in view when the screen changes.
   const firstRender = useRef(true);
@@ -199,7 +213,7 @@ export function BudgetCalculator() {
     } catch (err) {
       const kind = err instanceof LeadError && err.message === "NETWORK" ? "NETWORK" : "SERVER";
       if (err instanceof LeadError && err.message === "CONFIG") {
-        console.warn("[Lead] NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY is not set, so no email was sent.");
+        console.warn("[Lead] WEB3FORMS_ACCESS_KEY is not set, so no email was sent.");
       }
       // Locally, carry on so the AI can still be tested while the email step is down.
       if (process.env.NODE_ENV === "production") {
@@ -241,7 +255,7 @@ export function BudgetCalculator() {
 
   return (
     <div ref={topRef} className="scroll-mt-24">
-      <div className="rounded-[2rem] border border-white/60 bg-white/55 p-5 shadow-2xl shadow-primary/10 backdrop-blur-xl sm:p-8">
+      <div className="rounded-4xl border border-white/60 bg-white/55 p-5 shadow-2xl shadow-primary/10 backdrop-blur-xl sm:p-8">
         {phase === "build" && (
           <>
             {/* Progress */}

@@ -123,7 +123,7 @@ export function EventsStep({
         {customEvents.map((name) => (
           <OptionCard key={name} selected onClick={() => toggle(name)}>
             <IconBadge icon={CalendarPlus} active />
-            <span className="mt-3 block font-serif text-2xl break-words">{name}</span>
+            <span className="mt-3 block font-serif text-2xl wrap-break-word">{name}</span>
             <span className="block text-xs text-muted">Your own</span>
           </OptionCard>
         ))}
@@ -416,7 +416,7 @@ export function ServicesStep({
         {full && " · that's the max, remove one to add another"}
       </p>
 
-      <div className="-mx-5 mb-6 flex gap-2 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8 [scrollbar-width:none]" role="tablist">
+      <div className="-mx-5 mb-6 flex gap-2 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8 scrollbar-none" role="tablist">
         {card.categories.map((c, i) => {
           const count = c.items.filter((item) => selected.has(item.id)).length;
           return (

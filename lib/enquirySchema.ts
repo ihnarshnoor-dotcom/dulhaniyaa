@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { budgetRanges, guestRanges, services } from "@/data/site";
+import { isPurpose, purposeLabel } from "./enquiryPurpose";
 
 export const serviceOptions = services.map((s) => s.title);
 
@@ -11,8 +12,9 @@ function isTodayOrLater(value: string) {
   return !Number.isNaN(picked.getTime()) && picked.getTime() >= Date.now() - 86_400_000;
 }
 
-/** Shared by the form (browser) and the API route (server). */
+/** Rules for the contact form. */
 export const enquirySchema = z.object({
+  purpose: z.string().refine((v): boolean => isPurpose(v), "Please choose what this is about"),
   name: z.string().trim().min(2, "Please enter your name").max(80),
   phone: z
     .string()
@@ -45,6 +47,7 @@ export type Enquiry = z.infer<typeof enquirySchema>;
 export function enquiryToWhatsApp(e: Enquiry) {
   return [
     `Hi Dulhaniyaa! I just sent an enquiry on your website.`,
+    `About: ${purposeLabel(e.purpose)}`,
     `Name: ${e.name}`,
     `Wedding date: ${e.eventDate}`,
     `City: ${e.city}`,
@@ -52,4 +55,23 @@ export function enquiryToWhatsApp(e: Enquiry) {
     `Budget: ${e.budget}`,
     `Services: ${e.services.join(", ")}`,
   ].join("\n");
+}
+
+/** Rows for the enquiry email, in order. Includes one-tap call and WhatsApp links for the team. */
+export function enquiryEmailRows(e: Enquiry): Record<string, string> {
+  const digits = e.phone.replace(/\D/g, "").slice(-10);
+  return {
+    About: purposeLabel(e.purpose),
+    Name: e.name,
+    Phone: e.phone,
+    Email: e.email || "Not given",
+    "Wedding date": e.eventDate,
+    City: e.city,
+    Budget: e.budget,
+    Guests: e.guests,
+    Services: e.services.join(", "),
+    Message: e.message || "None",
+    Call: `tel:+91${digits}`,
+    WhatsApp: `https://wa.me/91${digits}`,
+  };
 }

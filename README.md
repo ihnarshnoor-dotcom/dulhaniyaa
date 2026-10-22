@@ -22,8 +22,9 @@ npm run dev
 
 Open http://localhost:3000.
 
-When you run it locally without Resend keys, submitting the form still shows the success screen,
-and the enquiry is printed in the terminal. On the live site the keys are required.
+Use a single settings file, `.env.local` (delete any old `.env`). Without `WEB3FORMS_ACCESS_KEY`
+the contact form and the budget calculator can't send emails, and without `FACILITATOR_URL` the
+budget calculator can't load. See `.env.example` for every setting.
 
 Other commands:
 
@@ -91,30 +92,22 @@ Replace the text logo in [`components/layout/Logo.tsx`](components/layout/Logo.t
 1. The visitor fills in the form ([`components/contact/EnquiryForm.tsx`](components/contact/EnquiryForm.tsx)).
    It is checked in the browser with **zod + react-hook-form**, using the rules in
    [`lib/enquirySchema.ts`](lib/enquirySchema.ts) (Indian 10-digit mobile numbers, a date that isn't in the past, and so on).
-2. The form sends the data to `/api/enquiry` ([`app/api/enquiry/route.ts`](app/api/enquiry/route.ts)), which:
-   - **rate-limits** each IP address to 5 enquiries per 10 minutes,
-   - ignores bots that fill in the hidden **honeypot** field,
-   - checks the data again with the same rules,
-   - **emails the owner** through [Resend](https://resend.com). The email includes one-tap Call and WhatsApp links.
+2. The browser sends it straight to the team's inbox through [Web3Forms](https://web3forms.com)
+   ([`lib/web3forms.ts`](lib/web3forms.ts)), the same service and key as the budget calculator's leads.
+   - The email subject says what it's about (wedding, package, vendor partnership or other).
+   - The email includes one-tap Call and WhatsApp links.
+   - Bots that fill in the hidden **honeypot** field are dropped by Web3Forms.
 3. The visitor sees a thank-you screen with a **Chat on WhatsApp** button that has their details prefilled.
    If sending fails, they see a WhatsApp fallback instead.
 
-Enquiries are **not stored in a database** yet. They're emailed only. To add Supabase or Google Sheets later,
-there is a marked spot in `app/api/enquiry/route.ts` ("Saving to a database").
+Enquiries are **not stored in a database** yet. They're emailed only.
 
-The rate limiter keeps its counts in memory, which is fine for a small business site. If spam ever becomes
-a problem, replace `lib/rateLimit.ts` with [Upstash Ratelimit](https://github.com/upstash/ratelimit-js).
+### Setting up Web3Forms (about 2 minutes)
 
-### Setting up Resend (about 10 minutes)
-
-1. Sign up at https://resend.com.
-2. **Domains → Add domain** → `dulhaniyaa.com`. Add the DNS records it shows at your domain registrar,
-   then wait for "Verified".
-3. **API Keys → Create API key**. Copy it into `RESEND_API_KEY`.
-4. Set `OWNER_EMAIL` (where enquiries go) and `FROM_EMAIL` (for example `Dulhaniyaa Website <enquiries@dulhaniyaa.com>`).
-
-Until the domain is verified, leave `FROM_EMAIL` empty. Resend's test sender only delivers to the email
-address you signed up to Resend with.
+1. Go to https://web3forms.com and create an access key with the email address that should receive enquiries.
+2. Put it in `WEB3FORMS_ACCESS_KEY`.
+3. In the Web3Forms dashboard, restrict the key to your domain. The key is public by design: it can only
+   deliver to the inbox it was created for.
 
 ---
 
@@ -123,7 +116,7 @@ address you signed up to Resend with.
 1. Push this project to GitHub.
 2. Go to https://vercel.com/new and import the repository. Vercel detects Next.js automatically.
 3. Before clicking **Deploy**, open **Environment Variables** and add every key from `.env.example`:
-   `RESEND_API_KEY`, `OWNER_EMAIL`, `FROM_EMAIL`, `NEXT_PUBLIC_WHATSAPP_NUMBER`, `NEXT_PUBLIC_SITE_URL`.
+   `FACILITATOR_URL`, `BACKEND_URL`, `WEB3FORMS_ACCESS_KEY`, `SITE_URL`, `WHATSAPP_NUMBER`.
 4. Click **Deploy**. Every later push to `main` redeploys automatically.
 
 If you change an environment variable later, redeploy (Deployments → ⋯ → Redeploy) so it takes effect.
@@ -138,11 +131,9 @@ If you change an environment variable later, redeploy (Deployments → ⋯ → R
    - an **A** record for `@` pointing to the IP Vercel shows,
    - a **CNAME** record for `www` pointing to the value Vercel shows.
 3. Wait from a few minutes to a few hours. Vercel issues the HTTPS certificate automatically.
-4. Make sure `NEXT_PUBLIC_SITE_URL` is `https://dulhaniyaa.com`, then redeploy.
+4. Make sure `SITE_URL` is `https://dulhaniyaa.com`, then redeploy.
 5. Add the site to [Google Search Console](https://search.google.com/search-console) and submit
    `https://dulhaniyaa.com/sitemap.xml`.
-
-Keep the Resend DNS records when you change DNS settings, or enquiry emails will stop sending.
 
 ---
 
@@ -153,7 +144,6 @@ app/
   layout.tsx            Fonts, header, footer, WhatsApp button, SEO metadata, LocalBusiness schema
   page.tsx              Home
   services/ portfolio/ packages/ about/ contact/   One folder per page
-  api/enquiry/route.ts  Receives the form, sends the email
   sitemap.ts robots.ts  SEO files (served as /sitemap.xml and /robots.txt)
   icon.svg              Favicon
   globals.css           Brand colours and base styles

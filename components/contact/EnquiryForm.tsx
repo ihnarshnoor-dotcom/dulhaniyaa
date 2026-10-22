@@ -5,7 +5,9 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetRanges, guestRanges } from "@/data/site";
-import { enquirySchema, enquiryToWhatsApp, serviceOptions, type Enquiry } from "@/lib/enquirySchema";
+import { enquiryEmailRows, enquirySchema, enquiryToWhatsApp, serviceOptions, type Enquiry } from "@/lib/enquirySchema";
+import { enquirySubject, purposeFromParams, purposeGroups } from "@/lib/enquiryPurpose";
+import { LeadError, sendEnquiryEmail } from "@/lib/web3forms";
 import { whatsappLink } from "@/lib/whatsapp";
 import { buttonClasses } from "@/components/ui/Button";
 import { CheckIcon, WhatsAppIcon } from "@/components/ui/Icons";
@@ -16,7 +18,7 @@ type Status =
   | { state: "error"; message: string };
 
 const inputClass =
-  "block w-full min-h-12 rounded-lg border border-ink/15 bg-white/60 px-4 py-3 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 aria-[invalid=true]:border-red-600";
+  "block w-full min-h-12 rounded-lg border border-ink/15 bg-white/60 px-4 py-3 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 aria-invalid:border-red-600";
 
 export function EnquiryForm() {
   const searchParams = useSearchParams();
@@ -31,6 +33,7 @@ export function EnquiryForm() {
   } = useForm<Enquiry>({
     resolver: zodResolver(enquirySchema),
     defaultValues: {
+      purpose: purposeFromParams(searchParams.get("purpose"), pickedPackage),
       name: "",
       phone: "",
       email: "",
@@ -44,20 +47,23 @@ export function EnquiryForm() {
     },
   });
 
+  // Sent straight to the team's inbox through Web3Forms (same key as the budget calculator's leads).
   async function onSubmit(data: Enquiry) {
     try {
-      const res = await fetch("/api/enquiry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+      await sendEnquiryEmail({
+        subject: enquirySubject(data),
+        replyTo: data.email || undefined,
+        fields: enquiryEmailRows(data),
+        botcheck: data.website,
       });
-      const json = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) throw new Error(json.error ?? "Something went wrong.");
       setStatus({ state: "success", enquiry: data });
     } catch (err) {
       setStatus({
         state: "error",
-        message: err instanceof Error ? err.message : "Something went wrong.",
+        message:
+          err instanceof LeadError && err.message === "NETWORK"
+            ? "Check your connection and try again."
+            : "We couldn't send your enquiry right now.",
       });
     }
   }
@@ -94,6 +100,22 @@ export function EnquiryForm() {
       <p className="text-sm text-muted">Fields marked * are required.</p>
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <Field label="What's this about? *" error={errors.purpose?.message} id="purpose">
+            <select id="purpose" className={inputClass} aria-invalid={!!errors.purpose} {...register("purpose")}>
+              {purposeGroups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.options.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </Field>
+        </div>
+
         <Field label="Your name *" error={errors.name?.message} id="name">
           <input id="name" autoComplete="name" className={inputClass} aria-invalid={!!errors.name} {...register("name")} />
         </Field>
@@ -185,7 +207,7 @@ export function EnquiryForm() {
         </div>
 
         {/* Honeypot: hidden from real visitors. Bots fill it in and get ignored. */}
-        <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
           <label htmlFor="website">Website</label>
           <input id="website" tabIndex={-1} autoComplete="off" {...register("website")} />
         </div>
