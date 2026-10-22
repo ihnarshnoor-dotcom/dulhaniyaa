@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
+import { Suspense } from "react";
 import { business, images, services } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -105,7 +106,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <AuthProvider>
-          <Header />
+          {/* The header reads the current path. On routes whose path is only known per request
+              (like /s/[token] share links) that has to wait, which needs a Suspense boundary or
+              the build fails. Every other page still renders the header straight into its HTML. */}
+          <Suspense fallback={<div aria-hidden className="h-18 border-b border-transparent sm:h-20" />}>
+            <Header />
+          </Suspense>
           <main id="main" className="flex-1">
             {children}
           </main>
