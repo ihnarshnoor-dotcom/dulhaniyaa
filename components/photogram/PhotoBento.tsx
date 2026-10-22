@@ -24,7 +24,7 @@ function tileClass(photo: Photo, i: number) {
 const canTilt = () =>
   typeof window !== "undefined" && window.matchMedia("(hover: hover) and (prefers-reduced-motion: no-preference)").matches;
 
-function tilt(e: PointerEvent<HTMLButtonElement>) {
+export function tilt(e: PointerEvent<HTMLButtonElement>) {
   if (!canTilt()) return;
   const el = e.currentTarget;
   const rect = el.getBoundingClientRect();
@@ -36,7 +36,7 @@ function tilt(e: PointerEvent<HTMLButtonElement>) {
   el.style.setProperty("--gy", `${y * 100}%`);
 }
 
-function untilt(e: PointerEvent<HTMLButtonElement>) {
+export function untilt(e: PointerEvent<HTMLButtonElement>) {
   const el = e.currentTarget;
   el.style.setProperty("--rx", "0deg");
   el.style.setProperty("--ry", "0deg");
@@ -80,7 +80,7 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
     <>
       <div
         ref={grid}
-        className="grid grid-flow-dense auto-rows-[7.5rem] grid-cols-2 gap-3 [perspective:1200px] sm:auto-rows-[10rem] sm:grid-cols-3 sm:gap-4 lg:auto-rows-[11.5rem] lg:grid-cols-4"
+        className="grid grid-flow-dense auto-rows-30 grid-cols-2 gap-3 perspective-distant sm:auto-rows-40 sm:grid-cols-3 sm:gap-4 lg:auto-rows-46 lg:grid-cols-4"
       >
         {photos.map((photo, i) => (
           <div key={photo.src} data-tile className={tileClass(photo, i)}>
@@ -93,7 +93,7 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
               onPointerMove={tilt}
               onPointerLeave={untilt}
               aria-label={`Open photo: ${photo.alt}`}
-              className="group relative block size-full overflow-hidden rounded-2xl shadow-md shadow-ink/5 transition-[transform,box-shadow] duration-300 ease-out [transform:rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] hover:z-10 hover:shadow-2xl hover:shadow-primary/20 sm:rounded-3xl"
+              className="group relative block size-full overflow-hidden rounded-2xl shadow-md shadow-ink/5 transition-[transform,box-shadow] duration-300 ease-out transform-[rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] hover:z-10 hover:shadow-2xl hover:shadow-primary/20 sm:rounded-3xl"
             >
               <Image
                 src={photo.src}

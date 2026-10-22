@@ -51,6 +51,11 @@ export function Footer() {
               {social.instagramHandle}
             </a>
           </li>
+          <li>
+            <a href={social.youtube} target="_blank" rel="noopener noreferrer" className={linkClass}>
+              YouTube
+            </a>
+          </li>
         </ul>
       </Container>
 

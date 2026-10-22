@@ -4,6 +4,7 @@ import { business, images, services } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -103,11 +104,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <Header />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
         <WhatsAppFloat />
         <script
           type="application/ld+json"

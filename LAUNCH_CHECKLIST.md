@@ -5,7 +5,7 @@ Almost all of it is in [`data/site.ts`](data/site.ts). Search that file for `REP
 
 ## Business details (`data/site.ts` → `business`)
 - [ ] Phone number: `phoneDisplay` **and** `phoneHref`
-- [ ] WhatsApp number: `NEXT_PUBLIC_WHATSAPP_NUMBER` in Vercel (or `whatsappNumber`)
+- [ ] WhatsApp number: `WHATSAPP_NUMBER` in Vercel (or `whatsappNumber`)
 - [ ] Email address: `email`
 - [ ] Studio address: `address` (line1, line2, postalCode)
 - [ ] GST number: `gstNumber`
@@ -34,8 +34,8 @@ Almost all of it is in [`data/site.ts`](data/site.ts). Search that file for `REP
 - [ ] Brand colours (optional): edit the `@theme` block in `app/globals.css`
 
 ## Technical
-- [ ] Create a Resend account, verify your domain, set `RESEND_API_KEY`, `OWNER_EMAIL`, `FROM_EMAIL`
-- [ ] Set `NEXT_PUBLIC_SITE_URL` to the live domain
+- [ ] Set `WEB3FORMS_ACCESS_KEY` in Vercel (used by the contact form and the budget calculator), restricted to your domain
+- [ ] Set `SITE_URL` to the live domain, and `FACILITATOR_URL` and `BACKEND_URL` (see `.env.example`)
 - [ ] Send a test enquiry on the live site and confirm the email arrives
 - [ ] Tap the WhatsApp button on your phone and confirm it opens the right chat
 - [ ] Submit `https://dulhaniyaa.com/sitemap.xml` in Google Search Console

@@ -25,7 +25,7 @@ export function Hero() {
       {/* REPLACE: to use a looping video instead, swap <Image> for
           <video autoPlay muted loop playsInline poster="/images/hero.webp" className="absolute inset-0 size-full object-cover"><source src="/videos/hero.mp4" type="video/mp4" /></video> */}
       <Container className="hero-fade mt-16 [animation-delay:450ms] sm:mt-20">
-        <div className="relative aspect-4/3 overflow-hidden rounded-[2rem] shadow-2xl shadow-primary/10 sm:aspect-16/9">
+        <div className="relative aspect-4/3 overflow-hidden rounded-4xl shadow-2xl shadow-primary/10 sm:aspect-video">
           <Image
             src={images.hero.src}
             alt={images.hero.alt}

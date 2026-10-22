@@ -121,7 +121,7 @@ export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
       onClick={() => !sending && onClose()}
     >
       <div
-        className="photo-in relative w-full max-w-md rounded-t-[2rem] border border-white/60 bg-ivory/95 p-6 shadow-2xl backdrop-blur-xl sm:rounded-[2rem] sm:p-8"
+        className="photo-in relative w-full max-w-md rounded-t-4xl border border-white/60 bg-ivory/95 p-6 shadow-2xl backdrop-blur-xl sm:rounded-4xl sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
