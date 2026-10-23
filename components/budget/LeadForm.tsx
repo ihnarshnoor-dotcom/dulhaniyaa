@@ -30,7 +30,8 @@ type Props = {
   sending: boolean;
   failed: "NETWORK" | "SERVER" | null;
   onClose: () => void;
-  onSubmit: (contact: Contact) => void;
+  /** `website` is the hidden honeypot field: empty for real visitors. */
+  onSubmit: (contact: Contact, website: string) => void;
 };
 
 /** Details we ask for before running the AI plan. Shown as a popup. */
@@ -41,6 +42,7 @@ export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
     email: "",
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [website, setWebsite] = useState("");
   const firstInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -76,7 +78,7 @@ export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
       return;
     }
     setErrors({});
-    onSubmit(parsed.data);
+    onSubmit(parsed.data, website);
   }
 
   const field = (
@@ -162,6 +164,19 @@ export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
             autoComplete: "email",
             maxLength: 120,
           })}
+
+          {/* Honeypot: hidden from real visitors. Bots fill it in and get ignored. */}
+          <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+            <label htmlFor="lead-website">Website</label>
+            <input
+              id="lead-website"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
 
           {failed && (
             <p

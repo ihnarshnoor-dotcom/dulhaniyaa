@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { ChevronLeftIcon } from "@/components/ui/Icons";
 import { LeadError, sendLeadEmail } from "@/lib/web3forms";
+import { logLead } from "@/lib/leads";
 import { LeadForm, type Contact } from "./LeadForm";
 import { PlanLoading } from "./PlanLoading";
 import { PlanResult } from "./PlanResult";
@@ -195,7 +196,7 @@ export function BudgetCalculator() {
     }
   }
 
-  async function sendDetails(details: Contact) {
+  async function sendDetails(details: Contact, website = "") {
     if (!basics || !card || leadSending) return;
     const totals = estimate(card, selected, basics.guestCount, basics.events.length);
     const services = card.categories.flatMap((c) =>
@@ -203,13 +204,30 @@ export function BudgetCalculator() {
     );
     setLeadSending(true);
     setLeadFailed(null);
+    const lead = {
+      ...details,
+      ...basics,
+      services,
+      estimate: `${inrRange(totals.min, totals.max) ?? "-"}${totals.onRequest ? ` + ${totals.onRequest} on request` : ""}`,
+    };
     try {
-      await sendLeadEmail({
-        ...details,
-        ...basics,
-        services,
-        estimate: `${inrRange(totals.min, totals.max) ?? "-"}${totals.onRequest ? ` + ${totals.onRequest} on request` : ""}`,
-      });
+      await sendLeadEmail(lead);
+      void logLead(
+        "budget-calculator",
+        {
+          name: lead.name,
+          phone: lead.phone,
+          email: lead.email,
+          events: lead.events.join(", "),
+          city: lead.city,
+          guestCount: lead.guestCount,
+          budget: lead.budget ?? "",
+          date: lead.date ?? "",
+          services: lead.services.join(", "),
+          estimate: lead.estimate,
+        },
+        website,
+      );
     } catch (err) {
       const kind = err instanceof LeadError && err.message === "NETWORK" ? "NETWORK" : "SERVER";
       if (err instanceof LeadError && err.message === "CONFIG") {
