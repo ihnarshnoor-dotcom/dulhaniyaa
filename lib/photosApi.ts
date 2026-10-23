@@ -3,21 +3,24 @@
  * Separate from the AI facilitator in lib/facilitator.ts, which uses FACILITATOR_URL.
  *
  * Browser only: call these from client components after mount.
- * The backend is https://api.dulhaniyaa.com unless BACKEND_URL says otherwise
+ * The backend is https://api.dulhaniyaa.in unless NEXT_PUBLIC_BACKEND_URL says otherwise
  * (e.g. a local backend). Setting it to an empty value switches every backend feature off.
+ *
+ * Login: the access token lives in memory only (lib/authSession.ts) and the refresh token in an
+ * httpOnly cookie, so every call to /login and /auth/* sends credentials.
  */
 
-import { clearToken, getToken } from "./authStorage";
+import { browserLocks, createTokenStore, sendWithAuth, singleFlight, type TokenResponse } from "./authSession";
 import { errorFromResponse, NETWORK_MESSAGE, PhotosApiError } from "./photosApiErrors";
 import { buildQuery, type FeedFilters } from "./photoSearch";
 import { sharedLinkOf, shareRequestBody, type SharedLink, type ShareTarget } from "./share";
 
 export { PhotosApiError, friendlyMessage } from "./photosApiErrors";
 
-export const DEFAULT_BACKEND_URL = "https://api.dulhaniyaa.com";
+export const DEFAULT_BACKEND_URL = "https://api.dulhaniyaa.in";
 
 // Trailing slashes are trimmed so "…/" + "/me" doesn't become "//me".
-const BASE = (process.env.BACKEND_URL ?? DEFAULT_BACKEND_URL).trim().replace(/\/+$/, "");
+const BASE = (process.env.NEXT_PUBLIC_BACKEND_URL ?? DEFAULT_BACKEND_URL).trim().replace(/\/+$/, "");
 
 export const isPhotosApiEnabled = BASE !== "";
 
@@ -61,7 +64,9 @@ export type SavedPage = { photos: SavedPhoto[]; nextCursor: string | null };
 /** Alt text: title, then caption, then category. */
 export const photoAlt = (p: ApiPhoto) => p.title?.trim() || p.caption?.trim() || p.category || "Photo";
 
-/* ───────────── Session expiry ───────────── */
+/* ───────────── Session ───────────── */
+
+const tokens = createTokenStore();
 
 let onUnauthorized: ((redirect: boolean) => void) | null = null;
 
@@ -71,9 +76,43 @@ export function setUnauthorizedHandler(handler: typeof onUnauthorized) {
 }
 
 function sessionExpired(redirect: boolean) {
-  clearToken();
+  tokens.clear();
   onUnauthorized?.(redirect);
 }
+
+/** Forgets the access token in this tab. */
+export const clearSession = () => tokens.clear();
+
+/** Calls `listener` whenever the access token changes (login, refresh, logout). Returns an unsubscribe function. */
+export const onSessionChange = (listener: () => void) => tokens.subscribe(listener);
+
+/** When to refresh the access token proactively (ms timestamp), or null when logged out. */
+export const refreshDueAt = () => tokens.refreshAt();
+
+/**
+ * One POST /auth/refresh at a time, in this tab and across tabs. Resolves to the new access token,
+ * or null when the session is over (401, or 403 when this site's origin isn't allowed). Other
+ * failures (network, rate limit) are thrown and leave the session alone.
+ */
+export const refreshSession = singleFlight(
+  async (): Promise<string | null> => {
+    const version = tokens.version();
+    let data: TokenResponse;
+    try {
+      data = await request<TokenResponse>("/auth/refresh", { method: "POST", withCookie: true });
+    } catch (err) {
+      if (!(err instanceof PhotosApiError && (err.status === 401 || err.status === 403))) throw err;
+      if (tokens.version() !== version) return tokens.get();
+      tokens.clear();
+      return null;
+    }
+    // Logged in or out while this was on its way: that newer state wins.
+    if (tokens.version() !== version) return tokens.get();
+    tokens.set(data);
+    return data.token;
+  },
+  { lockName: "dulhaniyaa.auth.refresh", locks: browserLocks() },
+);
 
 /* ───────────── Requests ───────────── */
 
@@ -81,14 +120,19 @@ type RequestOptions = {
   method?: string;
   /** Plain objects are sent as JSON. FormData is sent as multipart (the browser sets the header). */
   body?: unknown;
-  /** Send the saved token. A 401 then ends the session. */
+  /** Send the access token, refreshing it once on a 401. A 401 after that ends the session. */
   auth?: boolean;
   /** On a 401, end the session without redirecting to /login (used when restoring a session). */
   quiet401?: boolean;
+  /** Send and accept cookies (credentials: "include"). /login and /auth/* need it for the refresh cookie. */
+  withCookie?: boolean;
   signal?: AbortSignal;
 };
 
-async function request<T>(path: string, { method = "GET", body, auth = false, quiet401 = false, signal }: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  { method = "GET", body, auth = false, quiet401 = false, withCookie = false, signal }: RequestOptions = {},
+): Promise<T> {
   if (!isPhotosApiEnabled) throw new PhotosApiError(0, NETWORK_MESSAGE);
 
   const headers: Record<string, string> = { Accept: "application/json" };
@@ -100,21 +144,32 @@ async function request<T>(path: string, { method = "GET", body, auth = false, qu
     payload = JSON.stringify(body);
   }
 
-  if (auth) {
-    const token = getToken();
-    if (!token) {
-      sessionExpired(!quiet401);
-      throw new PhotosApiError(401, "Please log in again.");
-    }
-    headers.Authorization = `Bearer ${token}`;
-  }
+  const send = (token?: string) =>
+    fetch(`${BASE}${path}`, {
+      method,
+      headers: token ? { ...headers, Authorization: `Bearer ${token}` } : headers,
+      body: payload,
+      cache: "no-store",
+      ...(withCookie && { credentials: "include" as const }),
+      signal,
+    });
 
-  let res: Response;
+  let res: Response | null;
   try {
-    res = await fetch(`${BASE}${path}`, { method, headers, body: payload, cache: "no-store", signal });
+    res = auth
+      ? await sendWithAuth(send, { getToken: tokens.get, isExpired: () => tokens.isExpired(Date.now()), refresh: refreshSession })
+      : await send();
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") throw err;
+    // A failed refresh (network, rate limit) already carries its own message.
+    if (err instanceof PhotosApiError) throw err;
     throw new PhotosApiError(0, NETWORK_MESSAGE);
+  }
+
+  // No session to send: nothing to refresh from.
+  if (!res) {
+    sessionExpired(!quiet401);
+    throw new PhotosApiError(401, "Please log in again.");
   }
 
   if (res.status === 204) return undefined as T;
@@ -144,8 +199,25 @@ export type SignupInput = { email: string; password: string; name: string; phone
 
 export const signup = (input: SignupInput) => request<{ id: string }>("/signup", { method: "POST", body: input });
 
-export const login = (email: string, password: string) =>
-  request<{ token: string }>("/login", { method: "POST", body: { email, password } });
+/** Logs in: keeps the access token in memory, and the backend sets the refresh cookie. */
+export async function login(email: string, password: string): Promise<void> {
+  tokens.set(await request<TokenResponse>("/login", { method: "POST", body: { email, password }, withCookie: true }));
+}
+
+/** Ends this device's session: the backend revokes it and clears the cookie. The token here is forgotten either way. */
+export async function logout(): Promise<void> {
+  try {
+    await request<void>("/auth/logout", { method: "POST", withCookie: true });
+  } finally {
+    tokens.clear();
+  }
+}
+
+/** Ends every session of the signed-in user, on every device, this one included. */
+export async function logoutAll(): Promise<void> {
+  await request<void>("/auth/logout-all", { method: "POST", auth: true, quiet401: true, withCookie: true });
+  tokens.clear();
+}
 
 export const getMe = (options: { quiet401?: boolean } = {}) => request<User>("/me", { auth: true, ...options });
 

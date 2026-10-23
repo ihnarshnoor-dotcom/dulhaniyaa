@@ -138,7 +138,7 @@ function AccountMenu({ name }: { name: string }) {
           tabIndex={-1}
           onClick={() => {
             setOpen(false);
-            logout();
+            void logout();
           }}
           className={`${itemClass} border-t border-ink/10 text-primary`}
         >

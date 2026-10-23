@@ -77,7 +77,7 @@ export const business = {
   // WhatsApp number: digits only with country code, no "+" or spaces.
   // Can also be set with WHATSAPP_NUMBER in .env.local
   whatsappNumber: process.env.WHATSAPP_NUMBER ?? "919810044015",
-  email: "hello@dulhaniyaa.com", // REPLACE
+  email: "dulhaniyaa@gmail.com", // REPLACE
   hours: "Open daily, 10:00 am – 8:00 pm",
 
   address: {
@@ -122,7 +122,7 @@ export const business = {
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/testimonials", label: "Testimonials" },
-  { href: "/budget-calculator", label: "Budget Calc" },
+  { href: "/budget-calculator", label: "Budget Calcy" },
   { href: "/photogram", label: "Photogram" },
 ];
 
@@ -140,121 +140,179 @@ export const headerLinks = navLinks.filter(
 export const b2b = {
   label: "Dulhaniyaa B2B",
   href: "/vendors",
-  intro: "The partners behind every great wedding: venues, caterers, decorators, photographers and more, brought together in one place.",
+  intro:
+    "The partners behind every great wedding: venues, caterers, decorators, photographers and more, brought together in one place.",
   services: [
     {
       slug: "venue",
       name: "Venue",
       text: "The venue decides almost everything else: guest count, décor, catering and the date itself. Farmhouses, banquet halls, palaces and destination resorts each set a different tone.",
-      image: photo(blueCoupleBg, "Couple facing each other across carved blue arches lit by lanterns"),
+      image: photo(
+        blueCoupleBg,
+        "Couple facing each other across carved blue arches lit by lanterns",
+      ),
     },
     {
       slug: "catering",
       name: "Catering",
       text: "Guests remember the food. From chaat counters at the mehendi to a full wedding feast, catering shapes the energy of every event and is often the biggest single part of the budget.",
-      image: photo(haldiPrep, "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony"),
+      image: photo(
+        haldiPrep,
+        "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony",
+      ),
     },
     {
       slug: "decor",
       name: "Décor",
       text: "Décor sets the mood before a single word is spoken. Florals, lighting, mandaps and stages turn an empty venue into a story, and each function needs its own look.",
-      image: photo(couple2, "Couple in pastel and blue outfits sitting together on a marigold-decorated swing"),
+      image: photo(
+        couple2,
+        "Couple in pastel and blue outfits sitting together on a marigold-decorated swing",
+      ),
     },
     {
       slug: "entertainment",
       name: "Entertainment",
       text: "Music carries the celebration from the dholki to the last dance. DJs, anchors, live acts and performers keep every function moving and every generation on the floor.",
-      image: photo(haldiShot3, "Family members dancing and laughing in yellow outfits at the haldi"),
+      image: photo(
+        haldiShot3,
+        "Family members dancing and laughing in yellow outfits at the haldi",
+      ),
     },
     {
       slug: "photography",
       name: "Photography",
       text: "Long after the last guest leaves, the photos and films are what remain. Candid moments, family portraits and cinematic edits are the memories couples share for a lifetime.",
-      image: photo(brideCloseup5, "Three close-ups of a bride with floral jewellery in warm evening light"),
+      image: photo(
+        brideCloseup5,
+        "Three close-ups of a bride with floral jewellery in warm evening light",
+      ),
     },
     {
       slug: "invitation-cards",
       name: "Invitation Cards",
       text: "The invitation is the first glimpse of the wedding guests receive. Printed cards, gift boxes and digital invites set the tone and carry the itinerary for every function.",
-      image: photo(brideCloseup4, "Bride in a red dupatta and embroidered lehenga peeking out from behind a door"),
+      image: photo(
+        brideCloseup4,
+        "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+      ),
     },
     {
       slug: "makeup",
       name: "Makeup",
       text: "The bride's look is one of the most anticipated moments of the day. A skilled makeup artist makes sure she feels like herself, only more radiant, through hours of rituals and photos.",
-      image: photo(makeupClose, "Bride with glittering eye makeup and a delicate hair accessory"),
+      image: photo(
+        makeupClose,
+        "Bride with glittering eye makeup and a delicate hair accessory",
+      ),
     },
     {
       slug: "liquor-bar",
       name: "Liquor & Bar",
       text: "The bar is where the party gathers. Skilled bartenders, signature cocktails, lounge corners and smooth licensing turn sangeet and reception nights into celebrations everyone talks about.",
-      image: photo(fireworks, "Friends holding up cold-fire sparklers for the couple's grand entrance"),
+      image: photo(
+        fireworks,
+        "Friends holding up cold-fire sparklers for the couple's grand entrance",
+      ),
     },
     {
       slug: "mehendi",
       name: "Mehendi",
       text: "Mehendi is one of the most loved traditions: intricate designs for the bride, quick patterns for the guests, and an afternoon of music and laughter while the colour deepens.",
-      image: photo(haldiShort5b, "Bride's mehendi-covered feet and hands in a yellow lehenga during the haldi"),
+      image: photo(
+        haldiShort5b,
+        "Bride's mehendi-covered feet and hands in a yellow lehenga during the haldi",
+      ),
     },
     {
       slug: "hospitality",
       name: "Hospitality",
       text: "Out-of-town family needs looking after: rooms, check-ins, welcome kits and help desks make guests feel at home and keep the wedding running smoothly.",
-      image: photo(couple1, "Couple in white and yellow sitting on rocks by turquoise water"),
+      image: photo(
+        couple1,
+        "Couple in white and yellow sitting on rocks by turquoise water",
+      ),
     },
     {
       slug: "band-baaja",
       name: "Band Baaja/Ghodiwala",
       text: "The baraat is pure celebration: a brass band, dhol, lights and the ghodi or buggy carrying the groom to the venue, with the whole family dancing along.",
-      image: photo(groomHaldiCloseUp, "Groom in sunglasses and a haldi-stained kurta looking over his shoulder"),
+      image: photo(
+        groomHaldiCloseUp,
+        "Groom in sunglasses and a haldi-stained kurta looking over his shoulder",
+      ),
     },
     {
       slug: "pandit",
       name: "Pandit/Priest",
       text: "The ceremonies are the heart of the wedding. An experienced pandit guides the families through every ritual, from the roka to the pheras, explaining the meaning along the way.",
-      image: photo(haldiShort4, "Bride's hennaed hand lighting a diya on a brass haldi thali"),
+      image: photo(
+        haldiShort4,
+        "Bride's hennaed hand lighting a diya on a brass haldi thali",
+      ),
     },
     {
       slug: "luxury-cars",
       name: "Luxury Car Rental",
       text: "The couple's arrival and departure are moments everyone watches. Vintage convertibles and luxury cars make the entry and the vidaai memorable, and look beautiful in photos.",
-      image: photo(carAndCouple, "Couple posing with a vintage copper convertible under a pink sky"),
+      image: photo(
+        carAndCouple,
+        "Couple posing with a vintage copper convertible under a pink sky",
+      ),
     },
     {
       slug: "wedding-favours",
       name: "Wedding Favours",
       text: "Favours are the thank-you guests take home: sweets, hampers and keepsakes that carry a little of the wedding with them.",
-      image: photo(haldiPic1, "Groom smiling through a window frame and a bride's hand with floral haldi jewellery"),
+      image: photo(
+        haldiPic1,
+        "Groom smiling through a window frame and a bride's hand with floral haldi jewellery",
+      ),
     },
     {
       slug: "cake-chocolate",
       name: "Cake & Chocolate",
       text: "A cake-cutting at the reception or a chocolate counter at the cocktail night adds a sweet moment guests love to gather around.",
-      image: photo(haldiPrep, "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony"),
+      image: photo(
+        haldiPrep,
+        "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony",
+      ),
     },
     {
       slug: "permissions",
       name: "Permissions & License",
       text: "Police NOCs, DJ and sound permissions and event liquor licences keep a wedding legal and stress-free. Missing one can stop the music on the night.",
-      image: photo(groomShot, "Groom in a gold sherwani with close-ups of his watch, fragrance and shoes"),
+      image: photo(
+        groomShot,
+        "Groom in a gold sherwani with close-ups of his watch, fragrance and shoes",
+      ),
     },
     {
       slug: "additional-services",
       name: "Additional Services",
       text: "Every wedding has its own extras: anchors for the ceremonies, guest management, last-minute help. The little things add up to a smooth day.",
-      image: photo(couple2, "Couple in pastel and blue outfits sitting together on a marigold-decorated swing"),
+      image: photo(
+        couple2,
+        "Couple in pastel and blue outfits sitting together on a marigold-decorated swing",
+      ),
     },
     {
       slug: "security-valet",
       name: "Security & Valet",
       text: "With hundreds of guests, cars and gifts, trained security and valet teams keep everyone safe and the arrivals smooth.",
-      image: photo(brideCloseup4, "Bride in a red dupatta and embroidered lehenga peeking out from behind a door"),
+      image: photo(
+        brideCloseup4,
+        "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+      ),
     },
     {
       slug: "transportation",
       name: "Transportation",
       text: "From airport pickups for out-of-town family to shuttles between the hotel and the venue, transport keeps everyone where they need to be, on time.",
-      image: photo(carAndCouple, "Couple posing with a vintage copper convertible under a pink sky"),
+      image: photo(
+        carAndCouple,
+        "Couple posing with a vintage copper convertible under a pink sky",
+      ),
     },
   ],
 };

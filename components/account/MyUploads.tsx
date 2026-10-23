@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SaveToBucket } from "@/components/buckets/SaveToBucket";
+import { PhotoPreview, toPreviewPhoto } from "@/components/photogram/PhotoPreview";
 import { SharePhoto } from "@/components/share/SharePhoto";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { TrashIcon } from "@/components/ui/Icons";
@@ -10,6 +11,12 @@ import { categoryLabel } from "@/lib/photoCategories";
 import { deleteImage, friendlyMessage, getMyUploads, photoAlt, setVisibility, type OwnPhoto } from "@/lib/photosApi";
 
 type Status = { state: "loading" } | { state: "ready" } | { state: "error"; message: string };
+
+/** Cuts `text` to at most `max` characters, ending in "…" when it was longer. */
+function shorten(text: string, max: number) {
+  const chars = Array.from(text);
+  return chars.length <= max ? text : chars.slice(0, max - 1).join("").trimEnd() + "…";
+}
 
 /** Loads pages until at least `minCount` photos (or the end), so a refresh keeps what was already shown. */
 async function fetchUploads(minCount: number, signal?: AbortSignal) {
@@ -23,7 +30,7 @@ async function fetchUploads(minCount: number, signal?: AbortSignal) {
   return { photos, nextCursor: cursor };
 }
 
-/** The signed-in user's photos, with a visibility switch and a delete button on each. */
+/** The signed-in user's photos, with a visibility switch and a delete button on each. Clicking a photo opens the Photogram preview. */
 export function MyUploads() {
   const [photos, setPhotos] = useState<OwnPhoto[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -36,6 +43,9 @@ export function MyUploads() {
   const retriedImages = useRef(false);
   // The photo waiting for delete confirmation.
   const [toDelete, setToDelete] = useState<OwnPhoto | null>(null);
+  // The photo open in the full-screen preview, and the tile to refocus when it closes.
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const lastOpened = useRef<HTMLButtonElement | null>(null);
 
   const reload = useCallback(async (minCount: number, signal?: AbortSignal) => {
     const result = await fetchUploads(minCount, signal);
@@ -58,6 +68,14 @@ export function MyUploads() {
         if (!controller.signal.aborted) setStatus({ state: "error", message: friendlyMessage(err) });
       });
     return () => controller.abort();
+  }, []);
+
+  // Close the preview if Next.js hides this page in the background.
+  useLayoutEffect(() => () => setOpenIndex(null), []);
+
+  const closePreview = useCallback(() => {
+    setOpenIndex(null);
+    requestAnimationFrame(() => lastOpened.current?.focus({ preventScroll: true }));
   }, []);
 
   async function loadMore() {
@@ -158,28 +176,38 @@ export function MyUploads() {
       )}
 
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-        {photos.map((photo) => {
+        {photos.map((photo, i) => {
           const src = photo.thumb_url ?? photo.url;
           const isPublic = photo.visibility === "public";
           const busy = busyId === photo.id;
           return (
-            <li key={photo.id} className="overflow-hidden rounded-2xl bg-white/60 shadow-md shadow-ink/5 sm:rounded-3xl">
+            <li key={photo.id} className="flex flex-col overflow-hidden rounded-2xl bg-white/60 shadow-md shadow-ink/5 sm:rounded-3xl">
               <div className="relative aspect-square bg-secondary/40">
-                {brokenSrcs.has(src) ? (
-                  <div className="grid size-full place-items-center px-3 text-center text-xs text-muted">Image unavailable</div>
-                ) : (
-                  <Image
-                    src={src}
-                    alt={photoAlt(photo)}
-                    fill
-                    unoptimized
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                    onError={() => onImageError(src)}
-                    className="object-cover"
-                  />
-                )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    lastOpened.current = e.currentTarget;
+                    setOpenIndex(i);
+                  }}
+                  aria-label={`Open photo: ${photoAlt(photo)}`}
+                  className="group block size-full overflow-hidden"
+                >
+                  {brokenSrcs.has(src) ? (
+                    <span className="grid size-full place-items-center px-3 text-center text-xs text-muted">Image unavailable</span>
+                  ) : (
+                    <Image
+                      src={src}
+                      alt={photoAlt(photo)}
+                      fill
+                      unoptimized
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
+                      onError={() => onImageError(src)}
+                      className="object-cover transition duration-500 ease-out group-hover:scale-105"
+                    />
+                  )}
+                </button>
                 <span
-                  className={`absolute top-2 left-2 rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-md ${
+                  className={`pointer-events-none absolute top-2 left-2 rounded-full px-2.5 py-1 text-xs font-medium backdrop-blur-md ${
                     isPublic ? "bg-white/80 text-primary" : "bg-ink/75 text-white"
                   }`}
                 >
@@ -187,10 +215,10 @@ export function MyUploads() {
                 </span>
                 <SaveToBucket photo={photo} className="absolute top-2 right-2" />
               </div>
-              <div className="space-y-2 p-3">
+              <div className="flex flex-1 flex-col gap-2 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="truncate text-sm font-medium text-ink" title={photoAlt(photo)}>
-                    {photo.title || categoryLabel(photo.category)}
+                    {shorten(photo.title || categoryLabel(photo.category), 15)}
                   </p>
                   <div className="flex shrink-0 items-center">
                     <SharePhoto photo={photo} />
@@ -206,7 +234,7 @@ export function MyUploads() {
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-2 text-xs text-muted">
+                <div className="mt-auto flex items-center justify-between gap-2 text-xs text-muted">
                   <span>{busy ? "Saving…" : "Show on Photogram"}</span>
                   <button
                     type="button"
@@ -237,6 +265,23 @@ export function MyUploads() {
             {loadingMore ? "Loading…" : "Load more"}
           </button>
         </div>
+      )}
+
+      {openIndex !== null && photos.length > 0 && (
+        <PhotoPreview
+          photos={photos.map(toPreviewPhoto)}
+          index={Math.min(openIndex, photos.length - 1)}
+          onClose={closePreview}
+          onChange={setOpenIndex}
+          actions={(i) =>
+            photos[i] && (
+              <>
+                <SaveToBucket key={`save-${photos[i].id}`} photo={photos[i]} variant="labelled" />
+                <SharePhoto key={`share-${photos[i].id}`} photo={photos[i]} variant="labelled" />
+              </>
+            )
+          }
+        />
       )}
 
       {toDelete && (

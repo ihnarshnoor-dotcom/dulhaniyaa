@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetRanges, guestRanges } from "@/data/site";
-import { enquiryEmailRows, enquirySchema, enquiryToWhatsApp, serviceOptions, type Enquiry } from "@/lib/enquirySchema";
+import { earliestEventDate, enquiryEmailRows, enquirySchema, enquiryToWhatsApp, serviceOptions, type Enquiry } from "@/lib/enquirySchema";
 import { enquirySubject, purposeFromParams, purposeGroups } from "@/lib/enquiryPurpose";
 import { LeadError, sendEnquiryEmail } from "@/lib/web3forms";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -17,6 +17,8 @@ type Status =
   | { state: "success"; enquiry: Enquiry }
   | { state: "error"; message: string };
 
+const noSubscribe = () => () => {};
+
 const inputClass =
   "block w-full min-h-12 rounded-lg border border-ink/15 bg-white/60 px-4 py-3 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 aria-invalid:border-red-600";
 
@@ -24,6 +26,9 @@ export function EnquiryForm() {
   const searchParams = useSearchParams();
   const pickedPackage = searchParams.get("package");
   const [status, setStatus] = useState<Status>({ state: "idle" });
+  // Greys out earlier days in the date picker. Read in the browser only: a date baked into the
+  // pre-rendered page would go stale. The schema checks the same rule when the form is sent.
+  const minEventDate = useSyncExternalStore(noSubscribe, () => earliestEventDate(), () => undefined);
 
   const {
     register,
@@ -146,7 +151,14 @@ export function EnquiryForm() {
         </Field>
 
         <Field label="Wedding date *" error={errors.eventDate?.message} id="eventDate">
-          <input id="eventDate" type="date" className={inputClass} aria-invalid={!!errors.eventDate} {...register("eventDate")} />
+          <input
+            id="eventDate"
+            type="date"
+            min={minEventDate}
+            className={inputClass}
+            aria-invalid={!!errors.eventDate}
+            {...register("eventDate")}
+          />
         </Field>
 
         <Field label="City *" error={errors.city?.message} id="city">

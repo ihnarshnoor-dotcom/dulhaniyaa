@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { Photo } from "@/data/site";
 import { SaveToBucket } from "@/components/buckets/SaveToBucket";
 import { SharePhoto } from "@/components/share/SharePhoto";
 import { buttonClasses } from "@/components/ui/Button";
@@ -14,10 +13,7 @@ import { friendlyMessage, getPhotogram, isPhotosApiEnabled, photoAlt, type ApiPh
 import { buildQuery, filtersFromParams, MAX_QUERY_LENGTH, normalizeQuery, type FeedFilters } from "@/lib/photoSearch";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { tilt, untilt } from "./PhotoBento";
-import { PhotoPreview } from "./PhotoPreview";
-
-/** API photos have no stored size; the preview sizes itself to the real image (h-auto / w-auto). */
-const toPreviewPhoto = (p: ApiPhoto): Photo => ({ src: p.url, alt: photoAlt(p), width: 1200, height: 1500, unoptimized: true });
+import { PhotoPreview, toPreviewPhoto } from "./PhotoPreview";
 
 const filterKey = (f: FeedFilters) => `${f.q}|${f.category}`;
 

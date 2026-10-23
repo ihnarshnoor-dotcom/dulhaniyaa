@@ -1,66 +1,114 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
-import { clearToken, getToken, setToken, TOKEN_KEY } from "@/lib/authStorage";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import * as api from "@/lib/photosApi";
 import { normalizePhone } from "@/lib/authSchemas";
+import { refreshDelay } from "@/lib/authSession";
 import { loginHref } from "@/lib/safeNext";
 
 type RegisterInput = { name: string; email: string; password: string; phone?: string };
 
 type AuthValue = {
   user: api.User | null;
-  /** True while a saved session is being restored. */
+  /** True while the session is being restored from the refresh cookie. */
   loading: boolean;
   /** True after the visitor logged out on purpose (protected pages then go home, not to /login). */
   signedOut: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (input: RegisterInput) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  /** Ends every session on every device. Throws if the server refuses, so the caller can say so. */
+  logoutAll: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthValue | null>(null);
+
+/** Tells this site's other tabs about logins and logouts ("login" | "logout"). */
+const TABS_CHANNEL = "dulhaniyaa.auth";
+/** Where the old long-lived token was kept before sessions moved to a cookie. Removed on load. */
+const OLD_TOKEN_KEY = "dulhaniyaa.photos.token";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<api.User | null>(null);
   const [loading, setLoading] = useState(api.isPhotosApiEnabled);
   const [signedOut, setSignedOut] = useState(false);
+  const tabs = useRef<BroadcastChannel | null>(null);
 
-  // Restore a saved session once, and follow logins/logouts made in other tabs.
+  // Restore the session once from the refresh cookie (a 401 means logged out),
+  // and follow logins/logouts made in other tabs.
   useEffect(() => {
     if (!api.isPhotosApiEnabled) return;
     let cancelled = false;
 
+    try {
+      window.localStorage.removeItem(OLD_TOKEN_KEY);
+    } catch {
+      // Storage blocked: nothing was saved there either.
+    }
+
     async function restore() {
-      if (!getToken()) {
-        if (!cancelled) {
-          setUser(null);
-          setLoading(false);
-        }
-        return;
-      }
       try {
-        const me = await api.getMe({ quiet401: true });
+        const token = await api.refreshSession();
+        const me = token ? await api.getMe({ quiet401: true }) : null;
         if (!cancelled) setUser(me);
       } catch {
-        // Expired token (already cleared) or server unreachable: carry on logged out.
+        // Server unreachable: carry on logged out.
         if (!cancelled) setUser(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === TOKEN_KEY || e.key === null) void restore();
-    };
+    const channel = typeof BroadcastChannel === "undefined" ? null : new BroadcastChannel(TABS_CHANNEL);
+    channel?.addEventListener("message", (e: MessageEvent) => {
+      if (e.data === "login") void restore();
+      if (e.data === "logout") {
+        api.clearSession();
+        setUser(null);
+        setSignedOut(true);
+      }
+    });
+    tabs.current = channel;
 
     void restore();
-    window.addEventListener("storage", onStorage);
     return () => {
       cancelled = true;
-      window.removeEventListener("storage", onStorage);
+      channel?.close();
+      tabs.current = null;
+    };
+  }, []);
+
+  // Refresh about a minute before the access token expires, while this tab is visible.
+  // A hidden tab catches up as soon as it is shown again (or on its next 401).
+  useEffect(() => {
+    if (!api.isPhotosApiEnabled) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const schedule = () => {
+      clearTimeout(timer);
+      const due = api.refreshDueAt();
+      if (due === null || document.visibilityState !== "visible") return;
+      timer = setTimeout(() => {
+        api.refreshSession().then(
+          (token) => {
+            if (!token) setUser(null);
+          },
+          () => {
+            // Network or rate limit: the next signed-in request refreshes on its 401 instead.
+          },
+        );
+      }, refreshDelay(due, Date.now()));
+    };
+
+    const unsubscribe = api.onSessionChange(schedule);
+    document.addEventListener("visibilitychange", schedule);
+    schedule();
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+      document.removeEventListener("visibilitychange", schedule);
     };
   }, []);
 
@@ -75,14 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [router]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const { token } = await api.login(email.trim(), password);
-    setToken(token);
+    await api.login(email.trim(), password);
     try {
       const me = await api.getMe({ quiet401: true });
       setUser(me);
       setSignedOut(false);
+      tabs.current?.postMessage("login");
     } catch (err) {
-      clearToken();
+      api.clearSession();
       throw err;
     }
   }, []);
@@ -97,15 +145,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [login],
   );
 
-  const logout = useCallback(() => {
-    clearToken();
+  // The access token is already forgotten by the API call; this clears the rest and goes home.
+  const endSessionHere = useCallback(() => {
     setUser(null);
     setSignedOut(true);
-  }, []);
+    tabs.current?.postMessage("logout");
+    router.replace("/");
+  }, [router]);
+
+  const logout = useCallback(async () => {
+    try {
+      await api.logout();
+    } catch {
+      // Server unreachable: this tab is logged out, but the cookie may restore the session on reload.
+    }
+    endSessionHere();
+  }, [endSessionHere]);
+
+  const logoutAll = useCallback(async () => {
+    await api.logoutAll();
+    endSessionHere();
+  }, [endSessionHere]);
 
   const value = useMemo(
-    () => ({ user, loading, signedOut, login, register, logout }),
-    [user, loading, signedOut, login, register, logout],
+    () => ({ user, loading, signedOut, login, register, logout, logoutAll }),
+    [user, loading, signedOut, login, register, logout, logoutAll],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

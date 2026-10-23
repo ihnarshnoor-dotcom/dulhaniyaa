@@ -40,7 +40,7 @@ function MobileAuthLinks({ onNavigate }: { onNavigate: () => void }) {
       <button
         type="button"
         onClick={() => {
-          logout();
+          void logout();
           onNavigate();
         }}
         className={linkClass}

@@ -1,13 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Button, buttonClasses } from "@/components/ui/Button";
+import { friendlyMessage } from "@/lib/photosApi";
 import { MyUploads } from "./MyUploads";
 
 /** The /account page body. Rendered inside <RequireAuth>, so there is always a user. */
 export function AccountView() {
-  const { user, logout } = useAuth();
+  const { user, logout, logoutAll } = useAuth();
+  const [endingAll, setEndingAll] = useState(false);
+  const [endAllError, setEndAllError] = useState<string | null>(null);
   if (!user) return null;
+
+  async function onLogoutAll() {
+    setEndingAll(true);
+    setEndAllError(null);
+    try {
+      await logoutAll();
+    } catch (err) {
+      setEndAllError(friendlyMessage(err));
+      setEndingAll(false);
+    }
+  }
 
   const details = [
     { label: "Name", value: user.name },
@@ -31,10 +46,26 @@ export function AccountView() {
           <Button href="/account/saved" variant="secondary">
             Saved photos
           </Button>
-          <button type="button" onClick={logout} className={buttonClasses("secondary")}>
+          <button type="button" onClick={() => void logout()} className={buttonClasses("secondary")}>
             Log out
           </button>
         </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm">
+        {endAllError && (
+          <p role="alert" className="text-red-700">
+            {endAllError}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={onLogoutAll}
+          disabled={endingAll}
+          className="py-1 font-medium text-primary underline-offset-4 hover:underline disabled:opacity-60"
+        >
+          {endingAll ? "Logging out everywhere…" : "Log out of all devices"}
+        </button>
       </div>
 
       <section aria-labelledby="uploads-heading" className="mt-14">

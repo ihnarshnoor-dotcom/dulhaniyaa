@@ -29,7 +29,7 @@ export default function BudgetCalculatorPage() {
 
       <Container className="max-w-4xl pt-14 pb-24 sm:pt-20 sm:pb-32">
         <div className="mb-10 text-center">
-          <p className="hero-fade text-xs font-medium tracking-[0.25em] text-primary uppercase">Budget Calc</p>
+          <p className="hero-fade text-xs font-medium tracking-[0.25em] text-primary uppercase">Budget Calcy</p>
           <h1 className="hero-fade mt-3 text-5xl leading-[1.05] [animation-delay:100ms] sm:text-6xl">
             Plan your wedding in a few taps
           </h1>
