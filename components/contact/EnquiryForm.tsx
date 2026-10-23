@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetRanges, guestRanges } from "@/data/site";
 import { earliestEventDate, enquiryEmailRows, enquirySchema, enquiryToWhatsApp, serviceOptions, type Enquiry } from "@/lib/enquirySchema";
-import { enquirySubject, purposeFromParams, purposeGroups } from "@/lib/enquiryPurpose";
+import { enquirySubject, purposeFromParams, purposeGroups, purposeLabel } from "@/lib/enquiryPurpose";
+import { logLead } from "@/lib/leads";
 import { LeadError, sendEnquiryEmail } from "@/lib/web3forms";
 import { whatsappLink } from "@/lib/whatsapp";
 import { buttonClasses } from "@/components/ui/Button";
@@ -61,6 +62,22 @@ export function EnquiryForm() {
         fields: enquiryEmailRows(data),
         botcheck: data.website,
       });
+      void logLead(
+        "lets-talk",
+        {
+          purpose: purposeLabel(data.purpose),
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          eventDate: data.eventDate,
+          city: data.city,
+          budget: data.budget,
+          guests: data.guests,
+          services: data.services.join(", "),
+          message: data.message,
+        },
+        data.website,
+      );
       setStatus({ state: "success", enquiry: data });
     } catch (err) {
       setStatus({
