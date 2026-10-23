@@ -7,10 +7,19 @@ export const serviceOptions = services.map((s) => s.title);
 // Accepts 98100 00000, 9810000000, +91 98100 00000, 09810000000
 export const indianMobile = /^(?:\+?91[\s-]?|0)?[6-9]\d{4}[\s-]?\d{5}$/;
 
-function isTodayOrLater(value: string) {
-  const picked = new Date(`${value}T23:59:59`);
-  return !Number.isNaN(picked.getTime()) && picked.getTime() >= Date.now() - 86_400_000;
+/** The wedding must be at least this many days away, so the team has time to plan. */
+export const MIN_DAYS_AHEAD = 15;
+
+/** The first date that can be picked, as YYYY-MM-DD in the visitor's own time zone (what <input type="date"> uses). */
+export function earliestEventDate(now = new Date()) {
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + MIN_DAYS_AHEAD);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
+
+// YYYY-MM-DD strings sort like dates, so a plain comparison works.
+export const isFarEnoughAhead = (value: string, now = new Date()) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(value) && value >= earliestEventDate(now);
 
 /** Rules for the contact form. */
 export const enquirySchema = z.object({
@@ -24,7 +33,7 @@ export const enquirySchema = z.object({
   eventDate: z
     .string()
     .min(1, "Please pick your wedding date")
-    .refine(isTodayOrLater, "The date can't be in the past"),
+    .refine((v) => isFarEnoughAhead(v), `Please pick a date at least ${MIN_DAYS_AHEAD} days from today`),
   city: z.string().trim().min(2, "Which city is the wedding in?").max(60),
   budget: z
     .string()

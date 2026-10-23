@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useEffect, useRef, type ReactNode } from "react";
 import type { Photo } from "@/data/site";
-import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from "@/components/ui/Icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
+} from "@/components/ui/Icons";
+import { photoAlt, type ApiPhoto } from "@/lib/photosApi";
 
 type Props = {
   photos: Photo[];
@@ -14,11 +19,27 @@ type Props = {
   actions?: (index: number) => ReactNode;
 };
 
+/** API photos have no stored size; the preview sizes itself to the real image (h-auto / w-auto). */
+export const toPreviewPhoto = (p: ApiPhoto): Photo => ({
+  src: p.url,
+  alt: photoAlt(p),
+  width: 1200,
+  height: 1500,
+  unoptimized: true,
+});
+
 /** True for events from inside a dialog opened on top of the preview, which handles its own keys and touches. */
-const fromOpenDialog = (target: EventTarget | null) => target instanceof Element && target.closest("dialog[open]") !== null;
+const fromOpenDialog = (target: EventTarget | null) =>
+  target instanceof Element && target.closest("dialog[open]") !== null;
 
 /** Full-screen preview of one photo, with the close button on the photo's top-right corner. */
-export function PhotoPreview({ photos, index, onClose, onChange, actions }: Props) {
+export function PhotoPreview({
+  photos,
+  index,
+  onClose,
+  onChange,
+  actions,
+}: Props) {
   const dialog = useRef<HTMLDivElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -46,7 +67,9 @@ export function PhotoPreview({ photos, index, onClose, onChange, actions }: Prop
       else if (e.key === "ArrowLeft") onChange((index - 1 + count) % count);
       else if (e.key === "ArrowRight") onChange((index + 1) % count);
       else if (e.key === "Tab" && dialog.current) {
-        const buttons = [...dialog.current.querySelectorAll<HTMLButtonElement>("button")];
+        const buttons = [
+          ...dialog.current.querySelectorAll<HTMLButtonElement>("button"),
+        ];
         const first = buttons[0];
         const last = buttons[buttons.length - 1];
         if (e.shiftKey && document.activeElement === first) {
@@ -98,7 +121,11 @@ export function PhotoPreview({ photos, index, onClose, onChange, actions }: Prop
       aria-label="Photo preview"
       className="preview-in fixed inset-0 z-50 flex items-center justify-center bg-ink/70 p-4 backdrop-blur-xl sm:p-10"
       onClick={onClose}
-      onTouchStart={(e) => (touchStartX.current = fromOpenDialog(e.target) ? null : e.touches[0].clientX)}
+      onTouchStart={(e) =>
+        (touchStartX.current = fromOpenDialog(e.target)
+          ? null
+          : e.touches[0].clientX)
+      }
       onTouchEnd={(e) => {
         if (touchStartX.current === null) return;
         const diff = e.changedTouches[0].clientX - touchStartX.current;
@@ -106,22 +133,27 @@ export function PhotoPreview({ photos, index, onClose, onChange, actions }: Prop
         touchStartX.current = null;
       }}
     >
-      <figure className="flex max-h-full flex-col items-center" onClick={(e) => e.stopPropagation()}>
+      <figure
+        className="flex max-h-full flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* The wrapper shrinks to the photo, so the close button sits on its corner. */}
         {actions ? (
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
             {image}
-            <div className="flex flex-wrap justify-center gap-2 sm:flex-col">{actions(index)}</div>
+            <div className="flex flex-wrap justify-center gap-2 sm:flex-col">
+              {actions(index)}
+            </div>
           </div>
         ) : (
           image
         )}
-        <figcaption className="mt-4 max-w-xl px-2 text-center text-sm text-white/85">
+        {/* <figcaption className="mt-4 max-w-xl px-2 text-center text-sm text-white/85">
           {photo.alt}
           <span className="ml-2 text-white/50 tabular-nums">
             {index + 1} / {count}
           </span>
-        </figcaption>
+        </figcaption> */}
       </figure>
 
       <button

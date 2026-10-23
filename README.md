@@ -116,7 +116,7 @@ Enquiries are **not stored in a database** yet. They're emailed only.
 1. Push this project to GitHub.
 2. Go to https://vercel.com/new and import the repository. Vercel detects Next.js automatically.
 3. Before clicking **Deploy**, open **Environment Variables** and add every key from `.env.example`:
-   `FACILITATOR_URL`, `BACKEND_URL`, `WEB3FORMS_ACCESS_KEY`, `SITE_URL`, `WHATSAPP_NUMBER`.
+   `FACILITATOR_URL`, `NEXT_PUBLIC_BACKEND_URL`, `WEB3FORMS_ACCESS_KEY`, `SITE_URL`, `WHATSAPP_NUMBER`.
 4. Click **Deploy**. Every later push to `main` redeploys automatically.
 
 If you change an environment variable later, redeploy (Deployments → ⋯ → Redeploy) so it takes effect.

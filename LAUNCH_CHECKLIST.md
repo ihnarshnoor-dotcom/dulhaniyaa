@@ -35,7 +35,7 @@ Almost all of it is in [`data/site.ts`](data/site.ts). Search that file for `REP
 
 ## Technical
 - [ ] Set `WEB3FORMS_ACCESS_KEY` in Vercel (used by the contact form and the budget calculator), restricted to your domain
-- [ ] Set `SITE_URL` to the live domain, and `FACILITATOR_URL` and `BACKEND_URL` (see `.env.example`)
+- [ ] Set `SITE_URL` to the live domain, and `FACILITATOR_URL` and `NEXT_PUBLIC_BACKEND_URL` (see `.env.example`)
 - [ ] Send a test enquiry on the live site and confirm the email arrives
 - [ ] Tap the WhatsApp button on your phone and confirm it opens the right chat
 - [ ] Submit `https://dulhaniyaa.com/sitemap.xml` in Google Search Console
