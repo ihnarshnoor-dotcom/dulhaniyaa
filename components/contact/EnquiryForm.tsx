@@ -5,8 +5,20 @@ import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { budgetRanges, guestRanges } from "@/data/site";
-import { earliestEventDate, enquiryEmailRows, enquirySchema, enquiryToWhatsApp, serviceOptions, type Enquiry } from "@/lib/enquirySchema";
-import { enquirySubject, purposeFromParams, purposeGroups, purposeLabel } from "@/lib/enquiryPurpose";
+import {
+  earliestEventDate,
+  enquiryEmailRows,
+  enquirySchema,
+  enquiryToWhatsApp,
+  serviceOptions,
+  type Enquiry,
+} from "@/lib/enquirySchema";
+import {
+  enquirySubject,
+  purposeFromParams,
+  purposeGroups,
+  purposeLabel,
+} from "@/lib/enquiryPurpose";
 import { logLead } from "@/lib/leads";
 import { LeadError, sendEnquiryEmail } from "@/lib/web3forms";
 import { whatsappLink } from "@/lib/whatsapp";
@@ -29,7 +41,11 @@ export function EnquiryForm() {
   const [status, setStatus] = useState<Status>({ state: "idle" });
   // Greys out earlier days in the date picker. Read in the browser only: a date baked into the
   // pre-rendered page would go stale. The schema checks the same rule when the form is sent.
-  const minEventDate = useSyncExternalStore(noSubscribe, () => earliestEventDate(), () => undefined);
+  const minEventDate = useSyncExternalStore(
+    noSubscribe,
+    () => earliestEventDate(),
+    () => undefined,
+  );
 
   const {
     register,
@@ -48,7 +64,9 @@ export function EnquiryForm() {
       budget: "",
       guests: "",
       services: [],
-      message: pickedPackage ? `I'm interested in the ${pickedPackage} package.` : "",
+      message: pickedPackage
+        ? `I'm interested in the ${pickedPackage} package.`
+        : "",
       website: "",
     },
   });
@@ -104,7 +122,9 @@ export function EnquiryForm() {
           Your enquiry has reached us. Someone from our team will call you on{" "}
           <strong className="text-ink">{enquiry.phone}</strong> within 24 hours.
         </p>
-        <p className="mt-6 text-sm text-muted">Can&apos;t wait? Message us right now:</p>
+        <p className="mt-6 text-sm text-muted">
+          Can&apos;t wait? Message us right now:
+        </p>
         <a
           href={whatsappLink(enquiryToWhatsApp(enquiry))}
           target="_blank"
@@ -123,8 +143,17 @@ export function EnquiryForm() {
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Field label="What's this about? *" error={errors.purpose?.message} id="purpose">
-            <select id="purpose" className={inputClass} aria-invalid={!!errors.purpose} {...register("purpose")}>
+          <Field
+            label="What's this about? *"
+            error={errors.purpose?.message}
+            id="purpose"
+          >
+            <select
+              id="purpose"
+              className={inputClass}
+              aria-invalid={!!errors.purpose}
+              {...register("purpose")}
+            >
               {purposeGroups.map((group) => (
                 <optgroup key={group.label} label={group.label}>
                   {group.options.map((o) => (
@@ -139,7 +168,13 @@ export function EnquiryForm() {
         </div>
 
         <Field label="Your name *" error={errors.name?.message} id="name">
-          <input id="name" autoComplete="name" className={inputClass} aria-invalid={!!errors.name} {...register("name")} />
+          <input
+            id="name"
+            autoComplete="name"
+            className={inputClass}
+            aria-invalid={!!errors.name}
+            {...register("name")}
+          />
         </Field>
 
         <Field label="Phone number *" error={errors.phone?.message} id="phone">
@@ -155,7 +190,11 @@ export function EnquiryForm() {
           />
         </Field>
 
-        <Field label="Email (optional)" error={errors.email?.message} id="email">
+        <Field
+          label="Email (optional)"
+          error={errors.email?.message}
+          id="email"
+        >
           <input
             id="email"
             type="email"
@@ -167,7 +206,11 @@ export function EnquiryForm() {
           />
         </Field>
 
-        <Field label="Wedding date *" error={errors.eventDate?.message} id="eventDate">
+        <Field
+          label="Wedding date *"
+          error={errors.eventDate?.message}
+          id="eventDate"
+        >
           <input
             id="eventDate"
             type="date"
@@ -179,11 +222,22 @@ export function EnquiryForm() {
         </Field>
 
         <Field label="City *" error={errors.city?.message} id="city">
-          <input id="city" autoComplete="address-level2" className={inputClass} aria-invalid={!!errors.city} {...register("city")} />
+          <input
+            id="city"
+            autoComplete="address-level2"
+            className={inputClass}
+            aria-invalid={!!errors.city}
+            {...register("city")}
+          />
         </Field>
 
         <Field label="Guest count *" error={errors.guests?.message} id="guests">
-          <select id="guests" className={inputClass} aria-invalid={!!errors.guests} {...register("guests")}>
+          <select
+            id="guests"
+            className={inputClass}
+            aria-invalid={!!errors.guests}
+            {...register("guests")}
+          >
             <option value="" disabled>
               Select…
             </option>
@@ -194,8 +248,17 @@ export function EnquiryForm() {
         </Field>
 
         <div className="sm:col-span-2">
-          <Field label="Approximate budget *" error={errors.budget?.message} id="budget">
-            <select id="budget" className={inputClass} aria-invalid={!!errors.budget} {...register("budget")}>
+          <Field
+            label="Approximate budget *"
+            error={errors.budget?.message}
+            id="budget"
+          >
+            <select
+              id="budget"
+              className={inputClass}
+              aria-invalid={!!errors.budget}
+              {...register("budget")}
+            >
               <option value="" disabled>
                 Select a range…
               </option>
@@ -207,23 +270,38 @@ export function EnquiryForm() {
         </div>
 
         <fieldset className="sm:col-span-2">
-          <legend className="mb-2 text-sm font-medium text-ink">Services you need *</legend>
+          <legend className="mb-2 text-sm font-medium text-ink">
+            Services you need *
+          </legend>
           <div className="grid grid-cols-2 gap-2">
             {serviceOptions.map((s) => (
               <label
                 key={s}
                 className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-ink/15 px-3 py-2 text-sm transition-colors has-checked:border-primary has-checked:bg-secondary/40"
               >
-                <input type="checkbox" value={s} className="size-4 accent-primary" {...register("services")} />
+                <input
+                  type="checkbox"
+                  value={s}
+                  className="size-4 accent-primary"
+                  {...register("services")}
+                />
                 {s}
               </label>
             ))}
           </div>
-          {errors.services && <p className="mt-1.5 text-sm text-red-700">{errors.services.message}</p>}
+          {errors.services && (
+            <p className="mt-1.5 text-sm text-red-700">
+              {errors.services.message}
+            </p>
+          )}
         </fieldset>
 
         <div className="sm:col-span-2">
-          <Field label="Anything else? (optional)" error={errors.message?.message} id="message">
+          <Field
+            label="Anything else? (optional)"
+            error={errors.message?.message}
+            id="message"
+          >
             <textarea
               id="message"
               rows={4}
@@ -236,14 +314,25 @@ export function EnquiryForm() {
         </div>
 
         {/* Honeypot: hidden from real visitors. Bots fill it in and get ignored. */}
-        <div aria-hidden="true" className="absolute left-[-9999px] h-0 w-0 overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="absolute left-[-9999px] h-0 w-0 overflow-hidden"
+        >
           <label htmlFor="website">Website</label>
-          <input id="website" tabIndex={-1} autoComplete="off" {...register("website")} />
+          <input
+            id="website"
+            tabIndex={-1}
+            autoComplete="off"
+            {...register("website")}
+          />
         </div>
       </div>
 
       {status.state === "error" && (
-        <div role="alert" className="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-800">
+        <div
+          role="alert"
+          className="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-800"
+        >
           <p>{status.message} You can also reach us directly on WhatsApp:</p>
           <a
             href={whatsappLink(
@@ -258,15 +347,29 @@ export function EnquiryForm() {
         </div>
       )}
 
-      <button type="submit" disabled={isSubmitting} className={buttonClasses("primary", "mt-8 w-full disabled:opacity-60")}>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={buttonClasses("primary", "mt-8 w-full disabled:opacity-60")}
+      >
         {isSubmitting ? "Sending…" : "Send enquiry"}
       </button>
-      <p className="mt-3 text-center text-xs text-muted">Your details are never shared.</p>
+      {/* <p className="mt-3 text-center text-xs text-muted">Your details are never shared.</p> */}
     </form>
   );
 }
 
-function Field({ id, label, error, children }: { id: string; label: string; error?: string; children: ReactNode }) {
+function Field({
+  id,
+  label,
+  error,
+  children,
+}: {
+  id: string;
+  label: string;
+  error?: string;
+  children: ReactNode;
+}) {
   return (
     <div>
       <label htmlFor={id} className="mb-2 block text-sm font-medium text-ink">
