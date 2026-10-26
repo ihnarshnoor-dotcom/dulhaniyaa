@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Where a share link (and its QR code) lands: one photo or a collection. No login needed: the token is the permission. */
+/** Where a photo share link (and its QR code) lands. No login needed: the token is the permission. */
 export default function SharedLinkPage({ params }: PageProps<"/s/[token]">) {
   if (!isPhotosApiEnabled) notFound();
 

@@ -129,6 +129,9 @@ function AccountMenu({ name }: { name: string }) {
         <Link href="/account/saved" role="menuitem" tabIndex={-1} onNavigate={() => setOpen(false)} className={itemClass}>
           Saved photos
         </Link>
+        <Link href="/account/shared" role="menuitem" tabIndex={-1} onNavigate={() => setOpen(false)} className={itemClass}>
+          Shared with me
+        </Link>
         <Link href="/account/upload" role="menuitem" tabIndex={-1} onNavigate={() => setOpen(false)} className={itemClass}>
           Upload a photo
         </Link>

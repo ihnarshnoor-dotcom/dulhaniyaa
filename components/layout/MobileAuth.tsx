@@ -34,6 +34,9 @@ function MobileAuthLinks({ onNavigate }: { onNavigate: () => void }) {
       <Link href="/account/saved" onNavigate={onNavigate} className={linkClass}>
         Saved photos
       </Link>
+      <Link href="/account/shared" onNavigate={onNavigate} className={linkClass}>
+        Shared with me
+      </Link>
       <Link href="/account/upload" onNavigate={onNavigate} className={linkClass}>
         Upload a photo
       </Link>

@@ -32,3 +32,8 @@ export function FormAlert({ children, ref }: { children: ReactNode; ref?: Ref<HT
     </div>
   );
 }
+
+/** A neutral form-level message, such as "we've sent you a code". */
+export function FormNotice({ children }: { children: ReactNode }) {
+  return <div className="rounded-lg bg-secondary/40 p-4 text-sm text-ink">{children}</div>;
+}

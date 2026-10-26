@@ -7,7 +7,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { BookmarkIcon, CheckIcon, CloseIcon, CopyIcon, ShareIcon, WhatsAppIcon } from "@/components/ui/Icons";
 import { createShare, friendlyMessage, revokeShare } from "@/lib/photosApi";
 import { loginHref } from "@/lib/safeNext";
-import { shareLink, type ShareTarget } from "@/lib/share";
+import { shareLink } from "@/lib/share";
 
 type Link = { token: string; url: string };
 type State =
@@ -18,12 +18,13 @@ type State =
   | { step: "revoked" };
 
 type Props = {
-  target: ShareTarget;
+  /** The photo to make a link to. Only public photos can have one. */
+  imageId: string;
   /** Dialog heading, e.g. "Share photo". */
   heading: string;
-  /** What is being shared, shown beside the thumbnail: a photo's alt text or a collection's name. */
+  /** What is being shared, shown beside the thumbnail: the photo's alt text. */
   subject: string;
-  /** Small preview image. Collections without one show a bookmark instead. */
+  /** Small preview image. Without one a bookmark shows instead. */
   thumbnail?: string | null;
   /** Shown before the link is made: who can see it and for how long. */
   notice: string;
@@ -38,10 +39,11 @@ type Props = {
 };
 
 /**
- * Dialog for making a share link to a photo or a collection, with copy, WhatsApp, the phone's share
- * sheet, a QR code and "Stop sharing". Logged-out visitors are sent to /login and brought back afterwards.
+ * Dialog for making a share link to a photo, with copy, WhatsApp, the phone's share sheet, a QR code
+ * and "Stop sharing". Logged-out visitors are sent to /login and brought back afterwards.
+ * Collections use ShareCollection instead: they are shared with people, not by link.
  */
-export function ShareDialog({ target, heading, subject, thumbnail, notice, footnote, message, qrFileName, trigger }: Props) {
+export function ShareDialog({ imageId, heading, subject, thumbnail, notice, footnote, message, qrFileName, trigger }: Props) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const titleId = useId();
@@ -71,11 +73,11 @@ export function ShareDialog({ target, heading, subject, thumbnail, notice, footn
     setError(null);
     setState({ step: "creating" });
     try {
-      const { token } = await createShare(target);
+      const { token } = await createShare(imageId);
       setState({ step: "ready", link: { token, url: shareLink(window.location.origin, token) } });
     } catch (err) {
       setState({ step: "idle" });
-      setError(friendlyMessage(err));
+      setError(friendlyMessage(err, "sharePhoto"));
     }
   }
 
