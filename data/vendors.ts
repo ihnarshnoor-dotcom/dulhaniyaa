@@ -9,30 +9,36 @@
  *  REPLACE the wording with real highlights (numbers, venues,
  *  standout weddings) whenever you have them. The keys must
  *  match the slugs in `b2b.services` (data/site.ts).
- *  Photos reuse the existing gallery for now.
  * ─────────────────────────────────────────────────────────────
  */
 
-import blueCoupleBg from "@/app/assets/blue-couple-bg.webp";
-import brideCloseUp2 from "@/app/assets/bride-close-up2.webp";
-import brideCloseup from "@/app/assets/bride-closeup.webp";
-import brideCloseup3 from "@/app/assets/bride-closeup3.webp";
-import brideCloseup4 from "@/app/assets/bride-closeup4.webp";
-import brideCloseup5 from "@/app/assets/bride-closeup5.webp";
-import carAndCouple from "@/app/assets/carandcouple3.webp";
-import couple1 from "@/app/assets/couple1.webp";
-import couple2 from "@/app/assets/couple2.webp";
-import couple4 from "@/app/assets/couple4.webp";
-import fireworks from "@/app/assets/fireworks.webp";
-import groomHaldiCloseUp from "@/app/assets/groom-haldi-close-up.webp";
-import groomShot from "@/app/assets/groom-shot.webp";
-import haldiPic1 from "@/app/assets/haldi-pic1.webp";
-import haldiPrep from "@/app/assets/haldi-prep.webp";
-import haldiShort4 from "@/app/assets/haldi-short4.webp";
-import haldiShort5 from "@/app/assets/haldi-short5.webp";
-import haldiShot3 from "@/app/assets/haldi-shot3.webp";
-import haldiShort5b from "@/app/assets/haldishort5.webp";
-import makeupClose from "@/app/assets/makeup-close.webp";
+import baaratOnWheels from "@/app/assets/baarat-on-wheels.webp";
+import bandBajaDholHigh1 from "@/app/assets/band-baja-dhol-high-1.webp";
+import bandBajaDholHigh2 from "@/app/assets/band-baja-dhol-high-2.webp";
+import catererMid3 from "@/app/assets/caterer-mid-3.webp";
+import couplePhotographyMid7 from "@/app/assets/couple-photography-mid-7.webp";
+import decorHaldiMid5 from "@/app/assets/decor-haldi-mid-5.webp";
+import decorHigh1 from "@/app/assets/decor-high-1.webp";
+import decorHigh2 from "@/app/assets/decor-high-2.webp";
+import decorHigh3 from "@/app/assets/decor-high-3.webp";
+import decorMid4 from "@/app/assets/decor-mid-4.webp";
+import decorMid5 from "@/app/assets/decor-mid-5.webp";
+import haldiMid3 from "@/app/assets/haldi-mid-3.webp";
+import makeupPhotographyMid4 from "@/app/assets/makeup-photography-mid-4.webp";
+import mandapDecorMid5 from "@/app/assets/mandap-decor-mid-5.webp";
+import mehendiMid4 from "@/app/assets/mehendi-mid-4.webp";
+import photographyLow6 from "@/app/assets/photography-low-6.webp";
+import photographyMakeupHigh2 from "@/app/assets/photography-makeup-high-2.webp";
+import photographyMid5 from "@/app/assets/photography-mid-5.webp";
+import photographyVenueHigh2 from "@/app/assets/photography-venue-high-2.webp";
+import receptionDecorMid7 from "@/app/assets/reception-decor-mid-7.webp";
+import venuePhotographyHigh1 from "@/app/assets/venue-photography-high-1.webp";
+import venuePhotographyHigh3 from "@/app/assets/venue-photography-high-3.webp";
+import venuePhotographyMid from "@/app/assets/venue-photography-mid.webp";
+import vintageCarHigh1 from "@/app/assets/vintage-car-high-1.webp";
+import vintageCarHigh2 from "@/app/assets/vintage-car-high-2.webp";
+import weddingFavoursLow1 from "@/app/assets/wedding-favours-low-1.webp";
+import weddingFavoursLow2 from "@/app/assets/wedding-favours-low-2.webp";
 import { photo, type Photo } from "./site";
 
 export type VendorPage = {
@@ -51,26 +57,33 @@ export const partnerBasics = [
 ];
 
 const p = {
-  couple2: photo(couple2, "Couple in pastel and blue outfits sitting together on a marigold-decorated swing"),
-  blueCoupleBg: photo(blueCoupleBg, "Couple facing each other across carved blue arches lit by lanterns"),
-  couple4: photo(couple4, "Couple in black and navy embracing under hanging wisteria"),
-  couple1: photo(couple1, "Couple in white and yellow sitting on rocks by turquoise water"),
-  haldiShort4: photo(haldiShort4, "Bride's hennaed hand lighting a diya on a brass haldi thali"),
-  brideCloseup5: photo(brideCloseup5, "Three close-ups of a bride with floral jewellery in warm evening light"),
-  brideCloseUp2: photo(brideCloseUp2, "Close-up of a bride adjusting her maang tikka, hands covered in mehendi"),
-  groomShot: photo(groomShot, "Groom in a gold sherwani with close-ups of his watch, fragrance and shoes"),
-  haldiPrep: photo(haldiPrep, "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony"),
-  haldiShort5: photo(haldiShort5, "Family in yellow and sunglasses making heart signs around the couple at the haldi"),
-  haldiShot3: photo(haldiShot3, "Family members dancing and laughing in yellow outfits at the haldi"),
-  fireworks: photo(fireworks, "Friends holding up cold-fire sparklers for the couple's grand entrance"),
-  makeupClose: photo(makeupClose, "Bride with glittering eye makeup and a delicate hair accessory"),
-  brideCloseup: photo(brideCloseup, "Bride in red with a gold nath and maang tikka looking down"),
-  brideCloseup3: photo(brideCloseup3, "Bride in a red dupatta hiding a smile behind her hennaed hands"),
-  haldiShort5b: photo(haldiShort5b, "Bride's mehendi-covered feet and hands in a yellow lehenga during the haldi"),
-  brideCloseup4: photo(brideCloseup4, "Bride in a red dupatta and embroidered lehenga peeking out from behind a door"),
-  haldiPic1: photo(haldiPic1, "Groom smiling through a window frame and a bride's hand with floral haldi jewellery"),
-  carAndCouple: photo(carAndCouple, "Couple posing with a vintage copper convertible under a pink sky"),
-  groomHaldiCloseUp: photo(groomHaldiCloseUp, "Groom in sunglasses and a haldi-stained kurta looking over his shoulder"),
+  baaratOnWheels: photo(baaratOnWheels, "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night"),
+  bandBajaDholHigh1: photo(bandBajaDholHigh1, "Friends playing the dhol and dancing around the bride"),
+  bandBajaDholHigh2: photo(bandBajaDholHigh2, "Dhol players in maroon kurtas under a marigold canopy"),
+  catererMid3: photo(catererMid3, "Chefs serving at a buffet laid out in a palace courtyard"),
+  couplePhotographyMid7: photo(couplePhotographyMid7, "Couple posing between carved maroon arches and lanterns"),
+  decorHaldiMid5: photo(decorHaldiMid5, "Couple seated in brass tubs at a haldi ceremony with tropical floral décor"),
+  decorHigh1: photo(decorHigh1, "Carved wooden arches with white drapes, florals and brass lamps"),
+  decorHigh2: photo(decorHigh2, "White wedding hall with a floral aisle leading to a flower arch"),
+  decorHigh3: photo(decorHigh3, "Outdoor lounge with sofas under draped arches and floral columns"),
+  decorMid4: photo(decorMid4, "Maroon and gold wedding stage with arched drapes and red florals"),
+  decorMid5: photo(decorMid5, "Night-time aisle lined with flowers under hanging chandeliers"),
+  haldiMid3: photo(haldiMid3, "Family in yellow dancing and cheering at the haldi"),
+  makeupPhotographyMid4: photo(makeupPhotographyMid4, "Bride in a red lehenga and kundan jewellery posing beside roses"),
+  mandapDecorMid5: photo(mandapDecorMid5, "Bride and groom exchanging varmalas under a floral mandap in a palace courtyard"),
+  mehendiMid4: photo(mehendiMid4, "Mehendi artist applying an intricate bridal design to the bride's hand"),
+  photographyLow6: photo(photographyLow6, "Bride in a peach lehenga seated among white flowers"),
+  photographyMakeupHigh2: photo(photographyMakeupHigh2, "Smiling bride in a red dupatta and gold jewellery in warm light"),
+  photographyMid5: photo(photographyMid5, "Couple and family walking along a palace corridor"),
+  photographyVenueHigh2: photo(photographyVenueHigh2, "Bride and groom under a floral mandap with a lake behind them"),
+  receptionDecorMid7: photo(receptionDecorMid7, "Reception hall with chandeliers, candlelit tables and a bar"),
+  venuePhotographyHigh1: photo(venuePhotographyHigh1, "Bride in a maroon lehenga holding a bouquet on palace steps"),
+  venuePhotographyHigh3: photo(venuePhotographyHigh3, "Bride and groom in a palace courtyard beside a reflecting pool"),
+  venuePhotographyMid: photo(venuePhotographyMid, "Bride and groom between carved pillars in a palace courtyard"),
+  vintageCarHigh1: photo(vintageCarHigh1, "Baraat walking beside a vintage maroon car by the lake"),
+  vintageCarHigh2: photo(vintageCarHigh2, "Flower-decked white vintage car with a chauffeur outside a palace"),
+  weddingFavoursLow1: photo(weddingFavoursLow1, "Table of pastel favour boxes laid out on a lawn"),
+  weddingFavoursLow2: photo(weddingFavoursLow2, "Illustrated wedding cards and tags tied with ribbon"),
 };
 
 export const vendorPages: Record<string, VendorPage> = {
@@ -80,7 +93,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Layouts planned for every function at one venue",
       "Site visits and bookings matched to the couple's dates",
     ],
-    gallery: [p.blueCoupleBg, p.couple1, p.brideCloseup4],
+    gallery: [p.venuePhotographyMid, p.venuePhotographyHigh3, p.venuePhotographyHigh1, p.photographyVenueHigh2],
     lookingFor: ["Clear capacity and availability", "Flexibility with outside décor and catering partners"],
   },
   catering: {
@@ -89,7 +102,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Live counters and chaat stations for mehendi and sangeet",
       "Menus coordinated with the bar, décor and timings of each event",
     ],
-    gallery: [p.haldiPrep, p.haldiShort5, p.haldiShot3],
+    gallery: [p.catererMid3, p.receptionDecorMid7],
     lookingFor: ["FSSAI registration and hygiene standards", "Capacity for both intimate and large weddings"],
   },
   decor: {
@@ -98,7 +111,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Mandaps, stages and photo corners for every function",
       "Evening lighting with lanterns, fairy lights and statement backdrops",
     ],
-    gallery: [p.couple2, p.blueCoupleBg, p.couple4, p.haldiShort4],
+    gallery: [p.decorHigh2, p.decorHigh1, p.decorHigh3, p.decorMid4, p.decorMid5],
     lookingFor: ["In-house florals and fabrication", "A team that can set up and strike on tight timelines"],
   },
   entertainment: {
@@ -107,7 +120,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Choreographers and performers for the sangeet",
       "Grand entries with cold-fire sparklers and live acts",
     ],
-    gallery: [p.haldiShot3, p.fireworks, p.haldiShort5],
+    gallery: [p.bandBajaDholHigh1, p.haldiMid3, p.receptionDecorMid7, p.decorMid4],
     lookingFor: ["Professional sound and lighting equipment", "Sound limits respected at every venue"],
   },
   photography: {
@@ -116,7 +129,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Bridal and groom portraits, getting-ready details included",
       "Pre-wedding shoots and cinematic wedding films",
     ],
-    gallery: [p.brideCloseup5, p.brideCloseUp2, p.couple1, p.groomShot],
+    gallery: [p.couplePhotographyMid7, p.photographyMid5, p.photographyMakeupHigh2, p.photographyVenueHigh2, p.venuePhotographyHigh1],
     lookingFor: ["A consistent editing style", "Delivery timelines for photos and films agreed up front"],
   },
   "invitation-cards": {
@@ -124,7 +137,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Printed cards, gift boxes and itinerary booklets",
       "Digital invites and RSVPs for every function",
     ],
-    gallery: [p.brideCloseup4, p.haldiShort4, p.haldiPic1],
+    gallery: [p.weddingFavoursLow2, p.photographyLow6, p.makeupPhotographyMid4],
     lookingFor: ["Proofing before print", "Reliable delivery across the city"],
   },
   makeup: {
@@ -133,7 +146,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Party makeup for the family on the big day",
       "Touch-ups through rituals, photos and the reception",
     ],
-    gallery: [p.makeupClose, p.brideCloseup, p.brideCloseup3, p.brideCloseUp2],
+    gallery: [p.makeupPhotographyMid4, p.photographyMakeupHigh2, p.photographyLow6, p.venuePhotographyHigh1],
     lookingFor: ["A portfolio of bridal looks", "Artists available for early-morning starts"],
   },
   "liquor-bar": {
@@ -142,7 +155,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Signature drinks and mocktail menus for every guest",
       "Lounge and hookah corners planned around venue rules",
     ],
-    gallery: [p.fireworks, p.couple4, p.groomShot],
+    gallery: [p.receptionDecorMid7, p.decorMid5],
     lookingFor: ["Experienced bartenders and trained attendants", "Help with event liquor licences"],
   },
   mehendi: {
@@ -150,7 +163,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Intricate bridal mehendi, including personalised motifs",
       "Teams for quick guest designs at busy mehendi functions",
     ],
-    gallery: [p.haldiShort5b, p.brideCloseup3, p.haldiShort4, p.brideCloseUp2],
+    gallery: [p.mehendiMid4, p.makeupPhotographyMid4],
     lookingFor: ["Natural, chemical-free henna", "A team that can scale for large guest lists"],
   },
   hospitality: {
@@ -159,7 +172,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Welcome hampers and help desks at the hotel",
       "Itineraries so every guest knows where to be",
     ],
-    gallery: [p.couple1, p.haldiShort5, p.blueCoupleBg],
+    gallery: [p.photographyMid5, p.vintageCarHigh2, p.venuePhotographyHigh3],
     lookingFor: ["Hotels and staff experienced with wedding groups", "Clear room rates and block policies"],
   },
   "band-baaja": {
@@ -168,7 +181,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Ghodi, buggies and decorated chhatris",
       "Baraat timings coordinated with the venue",
     ],
-    gallery: [p.groomHaldiCloseUp, p.haldiShot3, p.fireworks],
+    gallery: [p.bandBajaDholHigh2, p.bandBajaDholHigh1, p.baaratOnWheels, p.vintageCarHigh1],
     lookingFor: ["Well-cared-for horses and safe handling", "Punctual teams who respect noise limits"],
   },
   pandit: {
@@ -177,7 +190,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Puja samagri arranged for each ceremony",
       "Muhurat and timings shared in advance with the families",
     ],
-    gallery: [p.haldiShort4, p.haldiPrep, p.brideCloseup3],
+    gallery: [p.mandapDecorMid5, p.photographyVenueHigh2, p.decorHaldiMid5],
     lookingFor: ["Knowledge of different regional traditions", "Clear, warm explanations for the families"],
   },
   "luxury-cars": {
@@ -185,7 +198,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Vintage and luxury cars for the couple's entry and vidaai",
       "Decorated cars for couple photo shoots",
     ],
-    gallery: [p.carAndCouple, p.couple1],
+    gallery: [p.vintageCarHigh1, p.vintageCarHigh2],
     lookingFor: ["Well-kept, insured vehicles", "Punctual, uniformed chauffeurs"],
   },
   "wedding-favours": {
@@ -193,7 +206,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Mithai boxes and personalised hampers",
       "Return gifts matched to each function",
     ],
-    gallery: [p.haldiPic1, p.haldiShort4, p.brideCloseup5],
+    gallery: [p.weddingFavoursLow1, p.weddingFavoursLow2],
     lookingFor: ["Custom packaging and branding", "Reliable delivery to the venue"],
   },
   "cake-chocolate": {
@@ -201,7 +214,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Designer wedding and reception cakes",
       "Chocolate and dessert counters",
     ],
-    gallery: [p.haldiPrep, p.couple2, p.haldiShort5],
+    gallery: [p.catererMid3, p.receptionDecorMid7],
     lookingFor: ["Fresh, hygienically prepared desserts", "Designs matched to the wedding's theme"],
   },
   permissions: {
@@ -210,7 +223,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Event liquor licences",
       "Permissions checklists shared with every family",
     ],
-    gallery: [p.groomShot, p.fireworks],
+    gallery: [p.venuePhotographyHigh3, p.venuePhotographyMid],
     lookingFor: ["Knowledge of local rules and timelines", "Paperwork filed well before the wedding"],
   },
   "additional-services": {
@@ -218,7 +231,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Guest management and help desks",
       "Extra hands for setup and coordination on the day",
     ],
-    gallery: [p.couple2, p.haldiShot3, p.haldiShort5],
+    gallery: [p.decorHigh3, p.photographyMid5, p.decorHaldiMid5],
     lookingFor: ["Flexible teams who can step in at short notice", "Clear rates for on-demand help"],
   },
   "security-valet": {
@@ -226,7 +239,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Security staff for the venue and gift table",
       "Valet parking for guests at every function",
     ],
-    gallery: [p.brideCloseup4, p.carAndCouple],
+    gallery: [p.vintageCarHigh2, p.venuePhotographyMid, p.venuePhotographyHigh3],
     lookingFor: ["Trained, uniformed staff", "Insurance and background-checked teams"],
   },
   transportation: {
@@ -235,7 +248,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Shuttles between the hotel and each venue",
       "Cars on call for the families",
     ],
-    gallery: [p.carAndCouple, p.couple1],
+    gallery: [p.baaratOnWheels, p.vintageCarHigh2, p.vintageCarHigh1],
     lookingFor: ["Clean, well-maintained vehicles", "Punctual drivers who know the city"],
   },
 };
