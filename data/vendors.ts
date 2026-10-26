@@ -12,33 +12,33 @@
  * ─────────────────────────────────────────────────────────────
  */
 
-import baaratOnWheels from "@/app/assets/new/baarat-on-wheels.webp";
-import bandBajaDholHigh1 from "@/app/assets/new/band-baja-dhol-high-1.webp";
-import bandBajaDholHigh2 from "@/app/assets/new/band-baja-dhol-high-2.webp";
-import catererMid3 from "@/app/assets/new/caterer-mid-3.webp";
-import couplePhotographyMid7 from "@/app/assets/new/couple-photography-mid-7.webp";
-import decorHaldiMid5 from "@/app/assets/new/decor-haldi-mid-5.webp";
-import decorHigh1 from "@/app/assets/new/decor-high-1.webp";
-import decorHigh2 from "@/app/assets/new/decor-high-2.webp";
-import decorHigh3 from "@/app/assets/new/decor-high-3.webp";
-import decorMid4 from "@/app/assets/new/decor-mid-4.webp";
-import decorMid5 from "@/app/assets/new/decor-mid-5.webp";
-import haldiMid3 from "@/app/assets/new/haldi-mid-3.webp";
-import makeupPhotographyMid4 from "@/app/assets/new/makeup-photography-mid-4.webp";
-import mandapDecorMid5 from "@/app/assets/new/mandap-decor-mid-5.webp";
-import mehendiMid4 from "@/app/assets/new/mehendi-mid-4.webp";
-import photographyLow6 from "@/app/assets/new/photography-low-6.webp";
-import photographyMakeupHigh2 from "@/app/assets/new/photography-makeup-high-2.webp";
-import photographyMid5 from "@/app/assets/new/photography-mid-5.webp";
-import photographyVenueHigh2 from "@/app/assets/new/photography-venue-high-2.webp";
-import receptionDecorMid7 from "@/app/assets/new/reception-decor-mid-7.webp";
-import venuePhotographyHigh1 from "@/app/assets/new/venue-photography-high-1.webp";
-import venuePhotographyHigh3 from "@/app/assets/new/venue-photography-high-3.webp";
-import venuePhotographyMid from "@/app/assets/new/venue-photography-mid.webp";
-import vintageCarHigh1 from "@/app/assets/new/vintage-car-high-1.webp";
-import vintageCarHigh2 from "@/app/assets/new/vintage-car-high-2.webp";
-import weddingFavoursLow1 from "@/app/assets/new/wedding-favours-low-1.webp";
-import weddingFavoursLow2 from "@/app/assets/new/wedding-favours-low-2.webp";
+import baaratOnWheels from "@/app/assets/baarat-on-wheels.webp";
+import bandBajaDholHigh1 from "@/app/assets/band-baja-dhol-high-1.webp";
+import bandBajaDholHigh2 from "@/app/assets/band-baja-dhol-high-2.webp";
+import catererMid3 from "@/app/assets/caterer-mid-3.webp";
+import couplePhotographyMid7 from "@/app/assets/couple-photography-mid-7.webp";
+import decorHaldiMid5 from "@/app/assets/decor-haldi-mid-5.webp";
+import decorHigh1 from "@/app/assets/decor-high-1.webp";
+import decorHigh2 from "@/app/assets/decor-high-2.webp";
+import decorHigh3 from "@/app/assets/decor-high-3.webp";
+import decorMid4 from "@/app/assets/decor-mid-4.webp";
+import decorMid5 from "@/app/assets/decor-mid-5.webp";
+import haldiMid3 from "@/app/assets/haldi-mid-3.webp";
+import makeupPhotographyMid4 from "@/app/assets/makeup-photography-mid-4.webp";
+import mandapDecorMid5 from "@/app/assets/mandap-decor-mid-5.webp";
+import mehendiMid4 from "@/app/assets/mehendi-mid-4.webp";
+import photographyLow6 from "@/app/assets/photography-low-6.webp";
+import photographyMakeupHigh2 from "@/app/assets/photography-makeup-high-2.webp";
+import photographyMid5 from "@/app/assets/photography-mid-5.webp";
+import photographyVenueHigh2 from "@/app/assets/photography-venue-high-2.webp";
+import receptionDecorMid7 from "@/app/assets/reception-decor-mid-7.webp";
+import venuePhotographyHigh1 from "@/app/assets/venue-photography-high-1.webp";
+import venuePhotographyHigh3 from "@/app/assets/venue-photography-high-3.webp";
+import venuePhotographyMid from "@/app/assets/venue-photography-mid.webp";
+import vintageCarHigh1 from "@/app/assets/vintage-car-high-1.webp";
+import vintageCarHigh2 from "@/app/assets/vintage-car-high-2.webp";
+import weddingFavoursLow1 from "@/app/assets/wedding-favours-low-1.webp";
+import weddingFavoursLow2 from "@/app/assets/wedding-favours-low-2.webp";
 import { photo, type Photo } from "./site";
 
 export type VendorPage = {
