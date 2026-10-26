@@ -1,24 +1,36 @@
 import type { StaticImageData } from "next/image";
-import blueCoupleBg from "@/app/assets/blue-couple-bg.webp";
-import brideCloseUp2 from "@/app/assets/bride-close-up2.webp";
-import brideCloseup from "@/app/assets/bride-closeup.webp";
-import brideCloseup3 from "@/app/assets/bride-closeup3.webp";
-import brideCloseup4 from "@/app/assets/bride-closeup4.webp";
-import brideCloseup5 from "@/app/assets/bride-closeup5.webp";
-import carAndCouple from "@/app/assets/carandcouple3.webp";
-import couple1 from "@/app/assets/couple1.webp";
-import couple2 from "@/app/assets/couple2.webp";
-import couple4 from "@/app/assets/couple4.webp";
-import fireworks from "@/app/assets/fireworks.webp";
-import groomHaldiCloseUp from "@/app/assets/groom-haldi-close-up.webp";
-import groomShot from "@/app/assets/groom-shot.webp";
-import haldiPic1 from "@/app/assets/haldi-pic1.webp";
-import haldiPrep from "@/app/assets/haldi-prep.webp";
-import haldiShort4 from "@/app/assets/haldi-short4.webp";
-import haldiShort5 from "@/app/assets/haldi-short5.webp";
-import haldiShot3 from "@/app/assets/haldi-shot3.webp";
-import haldiShort5b from "@/app/assets/haldishort5.webp";
-import makeupClose from "@/app/assets/makeup-close.webp";
+import baaratOnWheels from "@/app/assets/new/baarat-on-wheels.webp";
+import bandBajaDholHigh1 from "@/app/assets/new/band-baja-dhol-high-1.webp";
+import bandBajaDholHigh2 from "@/app/assets/new/band-baja-dhol-high-2.webp";
+import catererMid3 from "@/app/assets/new/caterer-mid-3.webp";
+import couplePhotographyMid7 from "@/app/assets/new/couple-photography-mid-7.webp";
+import decorHaldiMid5 from "@/app/assets/new/decor-haldi-mid-5.webp";
+import decorHigh1 from "@/app/assets/new/decor-high-1.webp";
+import decorHigh2 from "@/app/assets/new/decor-high-2.webp";
+import decorHigh3 from "@/app/assets/new/decor-high-3.webp";
+import decorMid4 from "@/app/assets/new/decor-mid-4.webp";
+import decorMid5 from "@/app/assets/new/decor-mid-5.webp";
+import groomAccessoriesLow7 from "@/app/assets/new/groom-accessories-low-7.webp";
+import groomHigh1 from "@/app/assets/new/groom-high-1.webp";
+import groomHigh2 from "@/app/assets/new/groom-high-2.webp";
+import haldiMid2 from "@/app/assets/new/haldi-mid-2.webp";
+import haldiMid3 from "@/app/assets/new/haldi-mid-3.webp";
+import haldiMid4 from "@/app/assets/new/haldi-mid-4.webp";
+import makeupPhotographyMid4 from "@/app/assets/new/makeup-photography-mid-4.webp";
+import mandapDecorMid5 from "@/app/assets/new/mandap-decor-mid-5.webp";
+import mehendiMid4 from "@/app/assets/new/mehendi-mid-4.webp";
+import photographyLow6 from "@/app/assets/new/photography-low-6.webp";
+import photographyMakeupHigh2 from "@/app/assets/new/photography-makeup-high-2.webp";
+import photographyMid5 from "@/app/assets/new/photography-mid-5.webp";
+import photographyVenueHigh2 from "@/app/assets/new/photography-venue-high-2.webp";
+import receptionDecorMid7 from "@/app/assets/new/reception-decor-mid-7.webp";
+import venuePhotographyHigh1 from "@/app/assets/new/venue-photography-high-1.webp";
+import venuePhotographyHigh3 from "@/app/assets/new/venue-photography-high-3.webp";
+import venuePhotographyMid from "@/app/assets/new/venue-photography-mid.webp";
+import vintageCarHigh1 from "@/app/assets/new/vintage-car-high-1.webp";
+import vintageCarHigh2 from "@/app/assets/new/vintage-car-high-2.webp";
+import weddingFavoursLow1 from "@/app/assets/new/wedding-favours-low-1.webp";
+import weddingFavoursLow2 from "@/app/assets/new/wedding-favours-low-2.webp";
 
 /**
  * ─────────────────────────────────────────────────────────────
@@ -30,8 +42,8 @@ import makeupClose from "@/app/assets/makeup-close.webp";
  *  Anything marked  // REPLACE  is a placeholder that must be
  *  swapped for real information before launch.
  *
- *  PHOTOS: all photos live in /app/assets as .webp files and are
- *  imported below. To change one, drop the new .webp into /app/assets,
+ *  PHOTOS: all photos live in /app/assets/new as .webp files and are
+ *  imported below. To change one, drop the new .webp into /app/assets/new,
  *  import it here and pass it to photo(). Width, height and the blurred
  *  loading preview are picked up from the file automatically.
  * ─────────────────────────────────────────────────────────────
@@ -148,8 +160,8 @@ export const b2b = {
       name: "Venue",
       text: "The venue decides almost everything else: guest count, décor, catering and the date itself. Farmhouses, banquet halls, palaces and destination resorts each set a different tone.",
       image: photo(
-        blueCoupleBg,
-        "Couple facing each other across carved blue arches lit by lanterns",
+        venuePhotographyMid,
+        "Bride and groom between carved pillars in a palace courtyard",
       ),
     },
     {
@@ -157,8 +169,8 @@ export const b2b = {
       name: "Catering",
       text: "Guests remember the food. From chaat counters at the mehendi to a full wedding feast, catering shapes the energy of every event and is often the biggest single part of the budget.",
       image: photo(
-        haldiPrep,
-        "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony",
+        catererMid3,
+        "Chefs serving at a buffet laid out in a palace courtyard",
       ),
     },
     {
@@ -166,8 +178,8 @@ export const b2b = {
       name: "Décor",
       text: "Décor sets the mood before a single word is spoken. Florals, lighting, mandaps and stages turn an empty venue into a story, and each function needs its own look.",
       image: photo(
-        couple2,
-        "Couple in pastel and blue outfits sitting together on a marigold-decorated swing",
+        decorHigh2,
+        "White wedding hall with a floral aisle leading to a flower arch",
       ),
     },
     {
@@ -175,8 +187,8 @@ export const b2b = {
       name: "Entertainment",
       text: "Music carries the celebration from the dholki to the last dance. DJs, anchors, live acts and performers keep every function moving and every generation on the floor.",
       image: photo(
-        haldiShot3,
-        "Family members dancing and laughing in yellow outfits at the haldi",
+        bandBajaDholHigh1,
+        "Friends playing the dhol and dancing around the bride",
       ),
     },
     {
@@ -184,8 +196,8 @@ export const b2b = {
       name: "Photography",
       text: "Long after the last guest leaves, the photos and films are what remain. Candid moments, family portraits and cinematic edits are the memories couples share for a lifetime.",
       image: photo(
-        brideCloseup5,
-        "Three close-ups of a bride with floral jewellery in warm evening light",
+        couplePhotographyMid7,
+        "Couple posing between carved maroon arches and lanterns",
       ),
     },
     {
@@ -193,8 +205,8 @@ export const b2b = {
       name: "Invitation Cards",
       text: "The invitation is the first glimpse of the wedding guests receive. Printed cards, gift boxes and digital invites set the tone and carry the itinerary for every function.",
       image: photo(
-        brideCloseup4,
-        "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+        weddingFavoursLow2,
+        "Illustrated wedding cards and tags tied with ribbon",
       ),
     },
     {
@@ -202,8 +214,8 @@ export const b2b = {
       name: "Makeup",
       text: "The bride's look is one of the most anticipated moments of the day. A skilled makeup artist makes sure she feels like herself, only more radiant, through hours of rituals and photos.",
       image: photo(
-        makeupClose,
-        "Bride with glittering eye makeup and a delicate hair accessory",
+        makeupPhotographyMid4,
+        "Bride in a red lehenga and kundan jewellery posing beside roses",
       ),
     },
     {
@@ -211,8 +223,8 @@ export const b2b = {
       name: "Liquor & Bar",
       text: "The bar is where the party gathers. Skilled bartenders, signature cocktails, lounge corners and smooth licensing turn sangeet and reception nights into celebrations everyone talks about.",
       image: photo(
-        fireworks,
-        "Friends holding up cold-fire sparklers for the couple's grand entrance",
+        receptionDecorMid7,
+        "Reception hall with chandeliers, candlelit tables and a bar",
       ),
     },
     {
@@ -220,8 +232,8 @@ export const b2b = {
       name: "Mehendi",
       text: "Mehendi is one of the most loved traditions: intricate designs for the bride, quick patterns for the guests, and an afternoon of music and laughter while the colour deepens.",
       image: photo(
-        haldiShort5b,
-        "Bride's mehendi-covered feet and hands in a yellow lehenga during the haldi",
+        mehendiMid4,
+        "Mehendi artist applying an intricate bridal design to the bride's hand",
       ),
     },
     {
@@ -229,8 +241,8 @@ export const b2b = {
       name: "Hospitality",
       text: "Out-of-town family needs looking after: rooms, check-ins, welcome kits and help desks make guests feel at home and keep the wedding running smoothly.",
       image: photo(
-        couple1,
-        "Couple in white and yellow sitting on rocks by turquoise water",
+        photographyMid5,
+        "Couple and family walking along a palace corridor",
       ),
     },
     {
@@ -238,8 +250,8 @@ export const b2b = {
       name: "Band Baaja/Ghodiwala",
       text: "The baraat is pure celebration: a brass band, dhol, lights and the ghodi or buggy carrying the groom to the venue, with the whole family dancing along.",
       image: photo(
-        groomHaldiCloseUp,
-        "Groom in sunglasses and a haldi-stained kurta looking over his shoulder",
+        bandBajaDholHigh2,
+        "Dhol players in maroon kurtas under a marigold canopy",
       ),
     },
     {
@@ -247,8 +259,8 @@ export const b2b = {
       name: "Pandit/Priest",
       text: "The ceremonies are the heart of the wedding. An experienced pandit guides the families through every ritual, from the roka to the pheras, explaining the meaning along the way.",
       image: photo(
-        haldiShort4,
-        "Bride's hennaed hand lighting a diya on a brass haldi thali",
+        mandapDecorMid5,
+        "Bride and groom exchanging varmalas under a floral mandap in a palace courtyard",
       ),
     },
     {
@@ -256,8 +268,8 @@ export const b2b = {
       name: "Luxury Car Rental",
       text: "The couple's arrival and departure are moments everyone watches. Vintage convertibles and luxury cars make the entry and the vidaai memorable, and look beautiful in photos.",
       image: photo(
-        carAndCouple,
-        "Couple posing with a vintage copper convertible under a pink sky",
+        vintageCarHigh1,
+        "Baraat walking beside a vintage maroon car by the lake",
       ),
     },
     {
@@ -265,8 +277,8 @@ export const b2b = {
       name: "Wedding Favours",
       text: "Favours are the thank-you guests take home: sweets, hampers and keepsakes that carry a little of the wedding with them.",
       image: photo(
-        haldiPic1,
-        "Groom smiling through a window frame and a bride's hand with floral haldi jewellery",
+        weddingFavoursLow1,
+        "Table of pastel favour boxes laid out on a lawn",
       ),
     },
     {
@@ -274,8 +286,8 @@ export const b2b = {
       name: "Cake & Chocolate",
       text: "A cake-cutting at the reception or a chocolate counter at the cocktail night adds a sweet moment guests love to gather around.",
       image: photo(
-        haldiPrep,
-        "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony",
+        catererMid3,
+        "Chefs serving at a buffet laid out in a palace courtyard",
       ),
     },
     {
@@ -283,8 +295,8 @@ export const b2b = {
       name: "Permissions & License",
       text: "Police NOCs, DJ and sound permissions and event liquor licences keep a wedding legal and stress-free. Missing one can stop the music on the night.",
       image: photo(
-        groomShot,
-        "Groom in a gold sherwani with close-ups of his watch, fragrance and shoes",
+        venuePhotographyHigh3,
+        "Bride and groom in a palace courtyard beside a reflecting pool",
       ),
     },
     {
@@ -292,8 +304,8 @@ export const b2b = {
       name: "Additional Services",
       text: "Every wedding has its own extras: anchors for the ceremonies, guest management, last-minute help. The little things add up to a smooth day.",
       image: photo(
-        couple2,
-        "Couple in pastel and blue outfits sitting together on a marigold-decorated swing",
+        decorHigh3,
+        "Outdoor lounge with sofas under draped arches and floral columns",
       ),
     },
     {
@@ -301,8 +313,8 @@ export const b2b = {
       name: "Security & Valet",
       text: "With hundreds of guests, cars and gifts, trained security and valet teams keep everyone safe and the arrivals smooth.",
       image: photo(
-        brideCloseup4,
-        "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+        vintageCarHigh2,
+        "Flower-decked white vintage car with a chauffeur outside a palace",
       ),
     },
     {
@@ -310,8 +322,8 @@ export const b2b = {
       name: "Transportation",
       text: "From airport pickups for out-of-town family to shuttles between the hotel and the venue, transport keeps everyone where they need to be, on time.",
       image: photo(
-        carAndCouple,
-        "Couple posing with a vintage copper convertible under a pink sky",
+        baaratOnWheels,
+        "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night",
       ),
     },
   ],
@@ -321,8 +333,8 @@ export const b2b = {
 
 export const images = {
   hero: photo(
-    couple2,
-    "Couple in pastel and blue outfits sitting together on a marigold-decorated swing",
+    photographyVenueHigh2,
+    "Bride and groom under a floral mandap with a lake behind them",
   ),
 };
 
@@ -334,8 +346,8 @@ export const services = [
     title: "Wedding Planning",
     short: "Venues, vendors, budgets and timelines, handled by one calm team.",
     image: photo(
-      fireworks,
-      "Groom's friends holding up cold-fire sparklers as the couple make their entrance at night",
+      venuePhotographyHigh3,
+      "Bride and groom in a palace courtyard beside a reflecting pool",
     ),
   },
   {
@@ -343,8 +355,8 @@ export const services = [
     title: "Decor & Design",
     short: "Mandaps, stages and entrances designed around your story.",
     image: photo(
-      haldiShort4,
-      "Bride's hennaed hand lighting a diya on a brass haldi thali",
+      decorHigh1,
+      "Carved wooden arches with white drapes, florals and brass lamps",
     ),
   },
   {
@@ -352,8 +364,8 @@ export const services = [
     title: "Photography & Films",
     short: "Candid and traditional coverage of every moment that matters.",
     image: photo(
-      brideCloseUp2,
-      "Close-up of a bride adjusting her maang tikka, hands covered in mehendi",
+      photographyMakeupHigh2,
+      "Smiling bride in a red dupatta and gold jewellery in warm light",
     ),
   },
   {
@@ -362,8 +374,8 @@ export const services = [
     short:
       "Lehengas and outfits for every function, styled and fitted for you.",
     image: photo(
-      brideCloseup4,
-      "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+      venuePhotographyHigh1,
+      "Bride in a maroon lehenga holding a bouquet on palace steps",
     ),
   },
 ];
@@ -380,8 +392,8 @@ export type ServiceGroup = {
 };
 
 export const whatWeDoHero = photo(
-  haldiShot3,
-  "Family members dancing and laughing in yellow outfits at the haldi",
+  couplePhotographyMid7,
+  "Couple posing between carved maroon arches and lanterns",
 );
 
 export const serviceGroups: ServiceGroup[] = [
@@ -391,8 +403,8 @@ export const serviceGroups: ServiceGroup[] = [
     intro:
       "From the first step on the red carpet to the last petal on the mandap, every space designed around your story.",
     image: photo(
-      blueCoupleBg,
-      "Couple facing each other across carved blue arches lit by lanterns",
+      decorHigh3,
+      "Outdoor lounge with sofas under draped arches and floral columns",
     ),
     categories: [
       {
@@ -458,8 +470,8 @@ export const serviceGroups: ServiceGroup[] = [
     intro:
       "Menus your guests will talk about, a bar that never runs dry, and rooms, rides and care for everyone who travels in.",
     image: photo(
-      haldiPrep,
-      "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony",
+      catererMid3,
+      "Chefs serving at a buffet laid out in a palace courtyard",
     ),
     categories: [
       {
@@ -524,8 +536,8 @@ export const serviceGroups: ServiceGroup[] = [
     intro:
       "The dhol that starts the baraat, the band that fills the dance floor and the entry nobody forgets.",
     image: photo(
-      fireworks,
-      "Friends holding up cold-fire sparklers for the couple's grand entrance",
+      baaratOnWheels,
+      "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night",
     ),
     categories: [
       {
@@ -605,8 +617,8 @@ export const serviceGroups: ServiceGroup[] = [
     intro:
       "Your look, your photographs and every permission in place, so the only thing on your mind is the day itself.",
     image: photo(
-      brideCloseup4,
-      "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+      makeupPhotographyMid4,
+      "Bride in a red lehenga and kundan jewellery posing beside roses",
     ),
     categories: [
       {
@@ -709,6 +721,7 @@ export const galleryCategories = [
   "Haldi",
   "Couples",
   "Celebrations",
+  "Décor",
 ] as const;
 
 type GalleryCategory = Exclude<(typeof galleryCategories)[number], "All">;
@@ -717,141 +730,218 @@ export const gallery: (Photo & { category: GalleryCategory })[] = [
   {
     category: "Couples",
     ...photo(
-      couple2,
-      "Couple in pastel and blue outfits sitting together on a marigold-decorated swing",
+      photographyVenueHigh2,
+      "Bride and groom under a floral mandap with a lake behind them",
     ),
   },
   {
     category: "Bride",
     ...photo(
-      brideCloseup3,
-      "Bride in a red dupatta hiding a smile behind her hennaed hands",
+      photographyMakeupHigh2,
+      "Smiling bride in a red dupatta and gold jewellery in warm light",
+    ),
+  },
+  {
+    category: "Groom",
+    ...photo(
+      groomHigh1,
+      "Groom in a sherwani and safa on a balcony overlooking the hills",
+    ),
+  },
+  {
+    category: "Décor",
+    ...photo(
+      decorHigh1,
+      "Carved wooden arches with white drapes, florals and brass lamps",
     ),
   },
   {
     category: "Haldi",
     ...photo(
-      haldiPic1,
-      "Groom smiling through a window frame and a bride's hand with floral haldi jewellery",
+      haldiMid4,
+      "Family applying haldi to the couple under a marigold mandap",
     ),
   },
   {
     category: "Celebrations",
     ...photo(
-      fireworks,
-      "Friends holding up cold-fire sparklers for the couple's grand entrance",
+      bandBajaDholHigh1,
+      "Friends playing the dhol and dancing around the bride",
+    ),
+  },
+  {
+    category: "Couples",
+    ...photo(
+      venuePhotographyHigh3,
+      "Bride and groom in a palace courtyard beside a reflecting pool",
     ),
   },
   {
     category: "Bride",
     ...photo(
-      brideCloseUp2,
-      "Close-up of a bride adjusting her maang tikka, hands covered in mehendi",
+      venuePhotographyHigh1,
+      "Bride in a maroon lehenga holding a bouquet on palace steps",
     ),
   },
   {
     category: "Groom",
     ...photo(
-      groomShot,
-      "Groom in a gold sherwani with close-ups of his watch, fragrance and shoes",
+      groomHigh2,
+      "Groom in a gold sherwani fastening his watch",
     ),
   },
   {
-    category: "Couples",
+    category: "Décor",
     ...photo(
-      couple4,
-      "Couple in black and navy embracing under hanging wisteria",
-    ),
-  },
-  {
-    category: "Haldi",
-    ...photo(
-      haldiShort5,
-      "Family in yellow and sunglasses making heart signs around the couple at the haldi",
-    ),
-  },
-  {
-    category: "Bride",
-    ...photo(
-      makeupClose,
-      "Bride with glittering eye makeup and a delicate hair accessory",
-    ),
-  },
-  {
-    category: "Couples",
-    ...photo(
-      carAndCouple,
-      "Couple posing with a vintage copper convertible under a pink sky",
+      decorHigh2,
+      "White wedding hall with a floral aisle leading to a flower arch",
     ),
   },
   {
     category: "Haldi",
     ...photo(
-      haldiPrep,
-      "Bowl of fresh haldi paste beside a plate of rice and turmeric for the ceremony",
+      haldiMid2,
+      "Friends in yellow and sunglasses making heart signs around the bride at the haldi",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      vintageCarHigh1,
+      "Baraat walking beside a vintage maroon car by the lake",
+    ),
+  },
+  {
+    category: "Couples",
+    ...photo(
+      mandapDecorMid5,
+      "Bride and groom exchanging varmalas under a floral mandap in a palace courtyard",
     ),
   },
   {
     category: "Bride",
     ...photo(
-      brideCloseup,
-      "Bride in red with a gold nath and maang tikka looking down",
+      makeupPhotographyMid4,
+      "Bride in a red lehenga and kundan jewellery posing beside roses",
+    ),
+  },
+  {
+    category: "Décor",
+    ...photo(
+      decorHigh3,
+      "Outdoor lounge with sofas under draped arches and floral columns",
+    ),
+  },
+  {
+    category: "Haldi",
+    ...photo(
+      decorHaldiMid5,
+      "Couple seated in brass tubs at a haldi ceremony with tropical floral décor",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      receptionDecorMid7,
+      "Reception hall with chandeliers, candlelit tables and a bar",
+    ),
+  },
+  {
+    category: "Couples",
+    ...photo(
+      couplePhotographyMid7,
+      "Couple posing between carved maroon arches and lanterns",
     ),
   },
   {
     category: "Groom",
     ...photo(
-      groomHaldiCloseUp,
-      "Groom in sunglasses and a haldi-stained kurta looking over his shoulder",
+      groomAccessoriesLow7,
+      "Groom's safa, embroidered juttis and pearl mala laid out on velvet",
+    ),
+  },
+  {
+    category: "Décor",
+    ...photo(
+      decorMid4,
+      "Maroon and gold wedding stage with arched drapes and red florals",
+    ),
+  },
+  {
+    category: "Haldi",
+    ...photo(
+      haldiMid3,
+      "Family in yellow dancing and cheering at the haldi",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      baaratOnWheels,
+      "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night",
     ),
   },
   {
     category: "Couples",
     ...photo(
-      blueCoupleBg,
-      "Couple facing each other across carved blue arches lit by lanterns",
-    ),
-  },
-  {
-    category: "Haldi",
-    ...photo(
-      haldiShot3,
-      "Family members dancing and laughing in yellow outfits at the haldi",
+      photographyMid5,
+      "Couple and family walking along a palace corridor",
     ),
   },
   {
     category: "Bride",
     ...photo(
-      brideCloseup4,
-      "Bride in a red dupatta and embroidered lehenga peeking out from behind a door",
+      mehendiMid4,
+      "Mehendi artist applying an intricate bridal design to the bride's hand",
     ),
   },
   {
-    category: "Haldi",
+    category: "Décor",
     ...photo(
-      haldiShort4,
-      "Bride's hennaed hand lighting a diya on a brass haldi thali",
+      decorMid5,
+      "Night-time aisle lined with flowers under hanging chandeliers",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      bandBajaDholHigh2,
+      "Dhol players in maroon kurtas under a marigold canopy",
     ),
   },
   {
     category: "Couples",
     ...photo(
-      couple1,
-      "Couple in white and yellow sitting on rocks by turquoise water",
+      venuePhotographyMid,
+      "Bride and groom between carved pillars in a palace courtyard",
     ),
   },
   {
     category: "Bride",
     ...photo(
-      brideCloseup5,
-      "Three close-ups of a bride with floral jewellery in warm evening light",
+      photographyLow6,
+      "Bride in a peach lehenga seated among white flowers",
     ),
   },
   {
-    category: "Haldi",
+    category: "Décor",
     ...photo(
-      haldiShort5b,
-      "Bride's mehendi-covered feet and hands in a yellow lehenga during the haldi",
+      weddingFavoursLow1,
+      "Table of pastel favour boxes laid out on a lawn",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      vintageCarHigh2,
+      "Flower-decked white vintage car with a chauffeur outside a palace",
+    ),
+  },
+  {
+    category: "Décor",
+    ...photo(
+      weddingFavoursLow2,
+      "Illustrated wedding cards and tags tied with ribbon",
     ),
   },
 ];
@@ -863,23 +953,22 @@ export const featuredWeddings = [
   {
     couple: "Simran & Harjot",
     image: photo(
-      carAndCouple,
-      "Couple posing with a vintage copper convertible under a pink sky",
+      mandapDecorMid5,
+      "Bride and groom exchanging varmalas under a floral mandap in a palace courtyard",
     ),
   },
   {
     couple: "Aditi & Karan",
     image: photo(
-      blueCoupleBg,
-      "Couple facing each other across carved blue arches lit by lanterns",
+      venuePhotographyHigh3,
+      "Bride and groom in a palace courtyard beside a reflecting pool",
     ),
   },
   {
     couple: "Neha & Rohit",
     image: photo(
-      couple1,
-      "Couple in white and yellow sitting on rocks by turquoise water",
-      "80% 50%",
+      venuePhotographyMid,
+      "Bride and groom between carved pillars in a palace courtyard",
     ),
   },
 ];

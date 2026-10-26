@@ -23,10 +23,10 @@ export function ScrollEffects({ children }: { children: ReactNode }) {
           if (!img) return;
           gsap.fromTo(
             img,
-            { yPercent: -8, scale: 1.18 },
+            { yPercent: -8, scale: 1.28 },
             {
               yPercent: 8,
-              scale: 1.08,
+              scale: 1.12,
               ease: "none",
               scrollTrigger: { trigger: frame, start: "top bottom", end: "bottom top", scrub: true },
             },

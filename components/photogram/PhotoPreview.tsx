@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Photo } from "@/data/site";
 import {
   ChevronLeftIcon,
@@ -32,6 +32,19 @@ export const toPreviewPhoto = (p: ApiPhoto): Photo => ({
 const fromOpenDialog = (target: EventTarget | null) =>
   target instanceof Element && target.closest("dialog[open]") !== null;
 
+type Size = { width: number; height: number };
+
+/** The size a photo of this shape will show at, matching the max-w / max-h classes on the image. */
+function fitToScreen(ratio: number, withActions: boolean): Size {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const sm = vw >= 640;
+  const maxW = sm ? vw * 0.8 - (withActions ? 224 : 0) : vw * 0.92;
+  const maxH = vh * (withActions && !sm ? 0.66 : 0.78);
+  const width = Math.min(maxW, maxH * ratio);
+  return { width, height: width / ratio };
+}
+
 /** Full-screen preview of one photo, with the close button on the photo's top-right corner. */
 export function PhotoPreview({
   photos,
@@ -45,6 +58,10 @@ export function PhotoPreview({
   const touchStartX = useRef<number | null>(null);
   const photo = photos[index];
   const count = photos.length;
+  // Until a photo has loaded, a shimmer box holds its place so the close button stays on the corner.
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const [lastSize, setLastSize] = useState<Size | null>(null);
+  const loaded = loadedSrc === photo?.src;
 
   const prev = () => onChange((index - 1 + count) % count);
   const next = () => onChange((index + 1) % count);
@@ -87,8 +104,22 @@ export function PhotoPreview({
 
   if (!photo) return null;
 
+  // Site photos know their real shape, so the shimmer matches the photo exactly. Uploaded
+  // photos don't, so the shimmer keeps the previous photo's size (or a 4:5 frame at first).
+  const skeleton =
+    !photo.unoptimized || !lastSize
+      ? fitToScreen(photo.width / photo.height, !!actions)
+      : lastSize;
+
   const image = (
     <div className="relative">
+      {!loaded && (
+        <div
+          aria-hidden
+          className="shimmer-light rounded-3xl shadow-2xl"
+          style={skeleton}
+        />
+      )}
       <Image
         key={photo.src}
         src={photo.src}
@@ -96,10 +127,13 @@ export function PhotoPreview({
         width={photo.width}
         height={photo.height}
         sizes="92vw"
-        placeholder={photo.blurDataURL ? "blur" : "empty"}
-        blurDataURL={photo.blurDataURL}
         unoptimized={photo.unoptimized}
-        className={`photo-in block h-auto max-h-[78svh] w-auto max-w-[92vw] rounded-3xl shadow-2xl ${actions ? "max-sm:max-h-[66svh] sm:max-w-[calc(80vw-14rem)]" : "sm:max-w-[80vw]"}`}
+        onLoad={(e) => {
+          const { width, height } = e.currentTarget.getBoundingClientRect();
+          setLastSize({ width, height });
+          setLoadedSrc(photo.src);
+        }}
+        className={`block h-auto max-h-[78svh] w-auto max-w-[92vw] rounded-3xl shadow-2xl ${actions ? "max-sm:max-h-[66svh] sm:max-w-[calc(80vw-14rem)]" : "sm:max-w-[80vw]"} ${loaded ? "photo-in" : "absolute top-0 left-0 opacity-0"}`}
       />
       <button
         ref={closeButton}

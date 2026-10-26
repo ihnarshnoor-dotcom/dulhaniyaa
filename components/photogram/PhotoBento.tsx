@@ -9,14 +9,24 @@ import { PhotoPreview } from "./PhotoPreview";
 type BentoPhoto = Photo & { category?: string };
 
 /**
+ * Landscape photos at these positions (repeating every 18 tiles) are shown
+ * large. The dense grid then scatters them: on 4 columns they land left,
+ * centre, right, left…, and on 3 columns they never stack on each other.
+ */
+const FEATURE_CYCLE = 18;
+const FEATURE_AT = new Set([0, 10, 16]);
+
+/**
  * Tile size follows the photo's shape so as little as possible is cropped.
  * One grid cell is roughly 3:2.
  */
-function tileClass(photo: Photo, i: number) {
+function tileClass(photo: Photo, i: number, total: number) {
   const ratio = photo.width / photo.height;
   if (ratio < 0.85) return "row-span-2"; // portrait
   if (ratio >= 2.4) return "col-span-2"; // panorama / side-by-side collage
-  if (ratio >= 1.35 && ratio < 1.95 && i % 5 === 0) return "col-span-2 row-span-2"; // feature
+  // Skip a feature near the end, where too few photos are left to fill around it.
+  if (ratio >= 1.35 && ratio < 1.95 && FEATURE_AT.has(i % FEATURE_CYCLE) && i + 4 < total)
+    return "col-span-2 row-span-2"; // feature
   return "";
 }
 
@@ -83,7 +93,7 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
         className="grid grid-flow-dense auto-rows-30 grid-cols-2 gap-3 perspective-distant sm:auto-rows-40 sm:grid-cols-3 sm:gap-4 lg:auto-rows-46 lg:grid-cols-4"
       >
         {photos.map((photo, i) => (
-          <div key={photo.src} data-tile className={tileClass(photo, i)}>
+          <div key={photo.src} data-tile className={tileClass(photo, i, photos.length)}>
             <button
               type="button"
               onClick={(e) => {
