@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { photoCountLabel, shareExpiry, shareLink, sharedLinkOf, shareRequestBody } from "./share";
+import { canSharePhoto, photoCountLabel, shareExpiry, shareLink, sharedLinkOf, shareRequestBody } from "./share";
 
 const now = new Date("2026-10-22T10:00:00Z");
 
@@ -11,11 +11,18 @@ describe("shareExpiry", () => {
 
 describe("shareRequestBody", () => {
   it("gives photo links a 3-day expiry", () => {
-    expect(shareRequestBody({ imageId: "img-1" }, now)).toEqual({ imageId: "img-1", expiresAt: "2026-10-25T10:00:00.000Z" });
+    expect(shareRequestBody("img-1", now)).toEqual({ imageId: "img-1", expiresAt: "2026-10-25T10:00:00.000Z" });
   });
 
-  it("sends collection links without an expiry", () => {
-    expect(shareRequestBody({ bucketId: "b-1" }, now)).toEqual({ bucketId: "b-1" });
+  it("never sends a bucketId: collections aren't shared by link", () => {
+    expect(shareRequestBody("img-1", now)).not.toHaveProperty("bucketId");
+  });
+});
+
+describe("canSharePhoto", () => {
+  it("allows public photos only", () => {
+    expect(canSharePhoto({ visibility: "public" })).toBe(true);
+    expect(canSharePhoto({ visibility: "private" })).toBe(false);
   });
 });
 
@@ -47,24 +54,9 @@ describe("sharedLinkOf", () => {
     expect(sharedLinkOf({ type: "image", image })).toEqual({ type: "image", photo: image });
   });
 
-  it("reads a collection link", () => {
-    expect(sharedLinkOf({ type: "bucket", bucket: { name: " Reds " }, images: [image] })).toEqual({
-      type: "bucket",
-      name: "Reds",
-      photos: [image],
-    });
-  });
-
-  it("reads an empty collection", () => {
-    expect(sharedLinkOf({ type: "bucket", bucket: { name: "Reds" }, images: [] })).toEqual({ type: "bucket", name: "Reds", photos: [] });
-  });
-
-  it("drops collection photos without a url and falls back to a default name", () => {
-    expect(sharedLinkOf({ type: "bucket", images: [image, { id: "2" }] })).toEqual({
-      type: "bucket",
-      name: "Shared collection",
-      photos: [image],
-    });
+  it("treats an old collection link as not found", () => {
+    expect(sharedLinkOf({ type: "bucket", bucket: { name: "Reds" }, images: [image] })).toBeNull();
+    expect(sharedLinkOf({ type: "bucket", images: [] })).toBeNull();
   });
 
   it("returns null for anything else", () => {

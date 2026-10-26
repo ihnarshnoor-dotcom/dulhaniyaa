@@ -1,13 +1,14 @@
 "use client";
 
 import { ShareIcon } from "@/components/ui/Icons";
-import { photoAlt, type ApiPhoto } from "@/lib/photosApi";
-import { SHARE_DAYS } from "@/lib/share";
+import { MAKE_PUBLIC_MESSAGE, photoAlt, type ApiPhoto } from "@/lib/photosApi";
+import { canSharePhoto, SHARE_DAYS } from "@/lib/share";
 import { ShareDialog } from "./ShareDialog";
 
 /**
  * "Share" button for one photo, opening the share dialog with a 3-day link.
- * Only public photos can be shared: on a private one the button is disabled.
+ * Only public photos can be shared: on a private one the icon button is dimmed and only says
+ * "Make this photo public to share it", and the labelled one isn't shown.
  */
 export function SharePhoto({
   photo,
@@ -19,12 +20,12 @@ export function SharePhoto({
   variant?: "icon" | "labelled";
   className?: string;
 }) {
-  const isPublic = photo.visibility === "public";
+  const isPublic = canSharePhoto(photo);
   if (variant === "labelled" && !isPublic) return null;
 
   return (
     <ShareDialog
-      target={{ imageId: photo.id }}
+      imageId={photo.id}
       heading="Share photo"
       subject={photoAlt(photo)}
       thumbnail={photo.thumb_url ?? photo.url}
@@ -34,13 +35,15 @@ export function SharePhoto({
       qrFileName="dulhaniyaa-photo-qr.png"
       trigger={(open, loading) =>
         variant === "icon" ? (
+          // aria-disabled rather than disabled, so the hint stays reachable by keyboard and shows on hover.
           <button
             type="button"
-            onClick={open}
-            disabled={loading || !isPublic}
-            aria-label={isPublic ? `Share "${photoAlt(photo)}"` : "Make this photo public to share it"}
-            title={isPublic ? "Share photo" : "Make it public to share"}
-            className={`grid size-8 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-secondary/60 hover:text-primary disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-muted ${className}`}
+            onClick={isPublic ? open : undefined}
+            disabled={loading}
+            aria-disabled={!isPublic || undefined}
+            aria-label={isPublic ? `Share "${photoAlt(photo)}"` : MAKE_PUBLIC_MESSAGE}
+            title={isPublic ? "Share photo" : MAKE_PUBLIC_MESSAGE}
+            className={`grid size-8 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-secondary/60 hover:text-primary disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:hover:bg-transparent aria-disabled:hover:text-muted ${className}`}
           >
             <ShareIcon width={16} height={16} />
           </button>

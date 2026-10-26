@@ -13,9 +13,22 @@
 import { browserLocks, createTokenStore, sendWithAuth, singleFlight, type TokenResponse } from "./authSession";
 import { errorFromResponse, NETWORK_MESSAGE, PhotosApiError } from "./photosApiErrors";
 import { buildQuery, type FeedFilters } from "./photoSearch";
-import { sharedLinkOf, shareRequestBody, type SharedLink, type ShareTarget } from "./share";
+import {
+  addedMemberOf,
+  collectionInfoOf,
+  countOf,
+  lookupResultOf,
+  membersOf,
+  sharedCollectionsOf,
+  type AddedMember,
+  type CollectionInfo,
+  type LookupResult,
+  type Member,
+  type SharedCollection,
+} from "./collections";
+import { sharedLinkOf, shareRequestBody, type SharedLink } from "./share";
 
-export { PhotosApiError, friendlyMessage } from "./photosApiErrors";
+export { EMAIL_NOT_FOUND_MESSAGE, friendlyMessage, isInvalidResetCode, MAKE_PUBLIC_MESSAGE, PhotosApiError } from "./photosApiErrors";
 
 export const DEFAULT_BACKEND_URL = "https://api.dulhaniyaa.in";
 
@@ -60,6 +73,11 @@ export type Bucket = { id: string; name: string };
 export type FeedPage = { photos: ApiPhoto[]; nextPage: number | null };
 export type UploadsPage = { photos: OwnPhoto[]; nextCursor: string | null };
 export type SavedPage = { photos: SavedPhoto[]; nextCursor: string | null };
+/**
+ * One collection's photos. `bucket` says whose it is and whether the viewer owns it (null from an older
+ * backend). Members see public photos only; `hiddenPrivateCount` is how many this viewer can't see.
+ */
+export type CollectionPage = SavedPage & { bucket: CollectionInfo | null; hiddenPrivateCount: number };
 
 /** Alt text: title, then caption, then category. */
 export const photoAlt = (p: ApiPhoto) => p.title?.trim() || p.caption?.trim() || p.category || "Photo";
@@ -221,6 +239,27 @@ export async function logoutAll(): Promise<void> {
 
 export const getMe = (options: { quiet401?: boolean } = {}) => request<User>("/me", { auth: true, ...options });
 
+/**
+ * Asks for a 6-digit reset code. The backend emails one only if the address has an account, but
+ * answers the same either way; resolves to its message ("If an account exists…"). 429 when rate limited.
+ */
+export async function forgotPassword(email: string): Promise<string> {
+  const message = field(await request<unknown>("/auth/forgot-password", { method: "POST", body: { email } }), "message");
+  return typeof message === "string" && message.trim()
+    ? message.trim()
+    : "If an account exists for this email, we've sent a 6-digit code to it.";
+}
+
+export type ResetPasswordInput = { email: string; code: string; password: string; confirmPassword: string };
+
+/**
+ * Sets a new password with the emailed code (a string: "042713" keeps its zero). Doesn't log in; the
+ * backend ends every session of that account. 400 with a readable `error` for bad input or a bad code.
+ */
+export async function resetPassword(input: ResetPasswordInput): Promise<void> {
+  await request<unknown>("/auth/reset-password", { method: "POST", body: input });
+}
+
 /* ───────────── Photos ───────────── */
 
 /**
@@ -298,10 +337,13 @@ export const saveToBucket = (bucketId: string, imageId: string) =>
 export const removeFromBucket = (bucketId: string, imageId: string) =>
   request<void>(`/buckets/${encodeURIComponent(bucketId)}/images/${encodeURIComponent(imageId)}`, { method: "DELETE", auth: true });
 
-/** Photos in one bucket, newest save first. */
-export async function getBucketImages(bucketId: string, cursor?: string | null, signal?: AbortSignal): Promise<SavedPage> {
+/**
+ * Photos in one bucket, newest save first, for its owner or a member. Anyone else gets a 404, the same
+ * as for a bucket that doesn't exist.
+ */
+export async function getBucketImages(bucketId: string, cursor?: string | null, signal?: AbortSignal): Promise<CollectionPage> {
   const data = await request<unknown>(`/buckets/${encodeURIComponent(bucketId)}/images${buildQuery({ cursor })}`, { auth: true, signal });
-  return savedPage(data);
+  return { ...savedPage(data), bucket: collectionInfoOf(field(data, "bucket")), hiddenPrivateCount: countOf(field(data, "hiddenPrivateCount")) };
 }
 
 /** Every saved photo, once each across all buckets. */
@@ -317,15 +359,55 @@ export async function searchSaved(
   return savedPage(await request<unknown>(`/me/saved/search${buildQuery({ q, bucketId, cursor })}`, { auth: true, signal }));
 }
 
+/* ───────────── Sharing a bucket with people ───────────── */
+
+const membersPath = (bucketId: string) => `/buckets/${encodeURIComponent(bucketId)}/members`;
+
+/**
+ * Owner only. Is there an account with exactly this email? Call it only on an explicit "Find", never
+ * while someone types: it is rate limited (429) and must not be usable to browse accounts.
+ */
+export async function lookupMember(bucketId: string, email: string): Promise<LookupResult> {
+  return lookupResultOf(await request<unknown>(`${membersPath(bucketId)}/lookup`, { method: "POST", body: { email }, auth: true }));
+}
+
+/**
+ * Owner only. Shares the bucket with the account that has this email; adding someone twice is fine.
+ * 404 "Email not found", 400 for the owner's own email, 409 past 50 people, 429 when rate limited.
+ * `emailed` says whether the backend sent them a "shared with you" email.
+ */
+export async function addMember(bucketId: string, email: string): Promise<AddedMember> {
+  return addedMemberOf(await request<unknown>(membersPath(bucketId), { method: "POST", body: { email }, auth: true }));
+}
+
+/** Owner only. Who the bucket is shared with, oldest first. */
+export async function listMembers(bucketId: string, signal?: AbortSignal): Promise<Member[]> {
+  return membersOf(await request<unknown>(membersPath(bucketId), { auth: true, signal }));
+}
+
+/** Owner only. Takes effect on the person's next request. A 404 means they no longer had access, which counts as done. */
+export async function removeMember(bucketId: string, userId: string): Promise<void> {
+  try {
+    await request<void>(`${membersPath(bucketId)}/${encodeURIComponent(userId)}`, { method: "DELETE", auth: true });
+  } catch (err) {
+    if (err instanceof PhotosApiError && err.status === 404) return;
+    throw err;
+  }
+}
+
+/** Buckets other people shared with the signed-in user, most recently shared first. */
+export async function sharedWithMe(signal?: AbortSignal): Promise<SharedCollection[]> {
+  return sharedCollectionsOf(await request<unknown>("/buckets/shared-with-me", { auth: true, signal }));
+}
+
 /* ───────────── Share links ───────────── */
 
 /**
- * Makes a link to one photo (expires after 3 days) or one of the user's collections (lasts until
- * revoked). Only share public photos: the backend also accepts the user's own private ones, so
- * callers must check `visibility` first.
+ * Makes a link to one of the user's public photos; it expires after 3 days. Check `canSharePhoto`
+ * first: the backend refuses private photos with a 400. Collections are never shared by link.
  */
-export const createShare = (target: ShareTarget) =>
-  request<{ token: string; url: string }>("/share", { method: "POST", body: shareRequestBody(target), auth: true });
+export const createShare = (imageId: string) =>
+  request<{ token: string; url: string }>("/share", { method: "POST", body: shareRequestBody(imageId), auth: true });
 
 /** Switches off one of the signed-in user's links. */
 export const revokeShare = async (token: string) => {
@@ -333,8 +415,8 @@ export const revokeShare = async (token: string) => {
 };
 
 /**
- * What a share link shows: one photo, or a collection's name and photos. No login needed.
- * 404 when the link is unknown, expired or switched off. Each call counts as a view, so don't poll it.
+ * What a share link shows: one public photo. No login needed. 404 when the link is unknown, expired,
+ * switched off, or an old collection link. Each call counts as a view, so don't poll it.
  */
 export async function getShare(token: string, signal?: AbortSignal): Promise<SharedLink> {
   const link = sharedLinkOf(await request<unknown>(`/share/${encodeURIComponent(token)}`, { signal }));

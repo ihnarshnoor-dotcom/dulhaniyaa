@@ -18,9 +18,14 @@ export function RegisterForm() {
   const router = useRouter();
   const nextParam = useSearchParams().get("next");
   const next = safeNextPath(nextParam);
-  const loginLink = nextParam ? `/login?next=${encodeURIComponent(next)}` : "/login";
+  const loginLink = nextParam
+    ? `/login?next=${encodeURIComponent(next)}`
+    : "/login";
   const { user, loading, register: createAccount } = useAuth();
-  const [serverError, setServerError] = useState<{ message: string; emailTaken: boolean } | null>(null);
+  const [serverError, setServerError] = useState<{
+    message: string;
+    emailTaken: boolean;
+  } | null>(null);
   const alertRef = useRef<HTMLDivElement>(null);
   // Set while this form signs someone in, so the "already signed in" redirect doesn't race the ?next redirect.
   const [submitted, setSubmitted] = useState(false);
@@ -31,7 +36,13 @@ export function RegisterForm() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: "", email: "", phone: "", password: "", confirmPassword: "" },
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   useEffect(() => {
@@ -67,7 +78,10 @@ export function RegisterForm() {
           {serverError.emailTaken && (
             <>
               {" "}
-              <Link href={loginLink} className="font-semibold text-primary underline underline-offset-4">
+              <Link
+                href={loginLink}
+                className="font-semibold text-primary underline underline-offset-4"
+              >
                 Go to log in
               </Link>
             </>
@@ -101,7 +115,7 @@ export function RegisterForm() {
         />
       </Field>
 
-      <Field label="Phone (optional)" id="phone" error={errors.phone?.message}>
+      <Field label="Phone" id="phone" error={errors.phone?.message}>
         <input
           id="phone"
           type="tel"
@@ -115,7 +129,12 @@ export function RegisterForm() {
         />
       </Field>
 
-      <Field label="Password *" id="password" hint="At least 8 characters." error={errors.password?.message}>
+      <Field
+        label="Password *"
+        id="password"
+        hint="At least 8 characters."
+        error={errors.password?.message}
+      >
         <PasswordInput
           id="password"
           autoComplete="new-password"
@@ -125,23 +144,36 @@ export function RegisterForm() {
         />
       </Field>
 
-      <Field label="Confirm password *" id="confirmPassword" error={errors.confirmPassword?.message}>
+      <Field
+        label="Confirm password *"
+        id="confirmPassword"
+        error={errors.confirmPassword?.message}
+      >
         <PasswordInput
           id="confirmPassword"
           autoComplete="new-password"
           aria-invalid={!!errors.confirmPassword}
-          aria-describedby={errors.confirmPassword ? errorId("confirmPassword") : undefined}
+          aria-describedby={
+            errors.confirmPassword ? errorId("confirmPassword") : undefined
+          }
           {...register("confirmPassword")}
         />
       </Field>
 
-      <button type="submit" disabled={isSubmitting} className={buttonClasses("primary", "w-full disabled:opacity-60")}>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={buttonClasses("primary", "w-full disabled:opacity-60")}
+      >
         {isSubmitting ? "Creating your account…" : "Create account"}
       </button>
 
       <p className="text-center text-sm text-muted">
         Already have an account?{" "}
-        <Link href={loginLink} className="font-medium text-primary underline underline-offset-4">
+        <Link
+          href={loginLink}
+          className="font-medium text-primary underline underline-offset-4"
+        >
           Log in
         </Link>
       </p>

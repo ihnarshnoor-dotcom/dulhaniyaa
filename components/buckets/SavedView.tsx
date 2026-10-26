@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Photo } from "@/data/site";
 import { PhotoPreview } from "@/components/photogram/PhotoPreview";
 import { ShareCollection } from "@/components/share/ShareCollection";
 import { Button, buttonClasses } from "@/components/ui/Button";
 import { CloseIcon, SearchIcon } from "@/components/ui/Icons";
-import { categoryLabel } from "@/lib/photoCategories";
+import { privateCount } from "@/lib/collections";
 import {
   friendlyMessage,
   getBucketImages,
@@ -22,6 +21,7 @@ import {
 } from "@/lib/photosApi";
 import { MAX_QUERY_LENGTH, normalizeQuery } from "@/lib/photoSearch";
 import { NewBucketForm } from "./NewBucketForm";
+import { PhotoGrid, PhotoGridSkeleton, previewActionClass, tileButtonClass } from "./PhotoGrid";
 
 const ALL = "all";
 
@@ -224,7 +224,8 @@ export function SavedView() {
           <ShareCollection
             key={currentBucket.id}
             bucket={currentBucket}
-            thumbnail={stale ? null : (photos[0]?.thumb_url ?? photos[0]?.url)}
+            // Only the unfiltered list says how many photos are private; search results would undercount.
+            privatePhotos={!query && !stale && result ? { count: privateCount(photos), more: result.nextCursor !== null } : null}
           />
         )}
       </div>
@@ -240,13 +241,7 @@ export function SavedView() {
           </div>
         )}
 
-        {!listError && result === null && (
-          <div role="status" aria-label="Loading saved photos" className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {Array.from({ length: 4 }, (_, i) => (
-              <div key={i} className="shimmer aspect-square rounded-2xl" />
-            ))}
-          </div>
-        )}
+        {!listError && result === null && <PhotoGridSkeleton label="Loading saved photos" />}
 
         {!listError && result !== null && photos.length === 0 && !stale && (
           <EmptyState query={query} bucket={currentBucket} hasBuckets={(buckets?.length ?? 0) > 0} onClear={() => setQueryInput("")} />
@@ -259,46 +254,29 @@ export function SavedView() {
         )}
 
         {photos.length > 0 && (
-          <ul className={`grid grid-cols-2 gap-3 transition-opacity sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 ${stale ? "opacity-50" : ""}`}>
-            {photos.map((photo, i) => (
-              <li key={photo.id} className="relative aspect-square">
+          <PhotoGrid
+            photos={photos}
+            dimmed={stale}
+            onOpen={(i, tile) => {
+              lastOpened.current = tile;
+              setOpenIndex(i);
+            }}
+            onImageError={onImageError}
+            overlay={(photo) =>
+              view !== ALL && (
                 <button
                   type="button"
-                  onClick={(e) => {
-                    lastOpened.current = e.currentTarget;
-                    setOpenIndex(i);
-                  }}
-                  aria-label={`Open photo: ${photoAlt(photo)}`}
-                  className="group relative block size-full overflow-hidden rounded-2xl bg-secondary/40 shadow-md shadow-ink/5 transition-shadow hover:shadow-2xl hover:shadow-primary/20 sm:rounded-3xl"
+                  onClick={() => remove(photo)}
+                  disabled={removingId !== null}
+                  aria-label={`Remove "${photoAlt(photo)}" from ${currentBucket?.name ?? "this collection"}`}
+                  title="Remove from collection"
+                  className={tileButtonClass}
                 >
-                  <Image
-                    src={photo.thumb_url ?? photo.url}
-                    alt={photoAlt(photo)}
-                    fill
-                    unoptimized
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
-                    onError={onImageError}
-                    className="object-cover transition duration-700 ease-out group-hover:scale-110"
-                  />
-                  <span className="absolute inset-x-2 bottom-2 truncate rounded-full bg-white/70 px-3 py-1.5 text-left text-xs text-ink backdrop-blur-md">
-                    {photo.title || categoryLabel(photo.category)}
-                  </span>
+                  <CloseIcon width={16} height={16} />
                 </button>
-                {view !== ALL && (
-                  <button
-                    type="button"
-                    onClick={() => remove(photo)}
-                    disabled={removingId !== null}
-                    aria-label={`Remove "${photoAlt(photo)}" from ${currentBucket?.name ?? "this collection"}`}
-                    title="Remove from collection"
-                    className="absolute top-2 right-2 grid size-9 place-items-center rounded-full bg-white/85 text-ink shadow-md backdrop-blur-md transition hover:bg-primary hover:text-white disabled:opacity-50"
-                  >
-                    <CloseIcon width={16} height={16} />
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
+              )
+            }
+          />
         )}
 
         {result?.nextCursor && !stale && (
@@ -323,12 +301,7 @@ export function SavedView() {
               ? (i) =>
                   photos[i] && (
                     <div className="flex flex-col items-center gap-2 sm:items-start">
-                      <button
-                        type="button"
-                        onClick={() => remove(photos[i])}
-                        disabled={removingId !== null}
-                        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium whitespace-nowrap text-ink shadow-xl transition hover:bg-primary hover:text-white disabled:opacity-60"
-                      >
+                      <button type="button" onClick={() => remove(photos[i])} disabled={removingId !== null} className={previewActionClass}>
                         <CloseIcon width={18} height={18} />
                         {removingId === photos[i].id ? "Removing…" : `Remove from ${currentBucket.name}`}
                       </button>

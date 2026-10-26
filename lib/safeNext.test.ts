@@ -35,6 +35,7 @@ describe("safeNextPath", () => {
     expect(safeNextPath("/login")).toBe("/account");
     expect(safeNextPath("/login?next=/account")).toBe("/account");
     expect(safeNextPath("/register")).toBe("/account");
+    expect(safeNextPath("/forgot-password")).toBe("/account");
     expect(safeNextPath("/loginhelp")).toBe("/loginhelp");
   });
 

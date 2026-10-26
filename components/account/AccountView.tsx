@@ -46,6 +46,9 @@ export function AccountView() {
           <Button href="/account/saved" variant="secondary">
             Saved photos
           </Button>
+          <Button href="/account/shared" variant="secondary">
+            Shared with me
+          </Button>
           <button type="button" onClick={() => void logout()} className={buttonClasses("secondary")}>
             Log out
           </button>

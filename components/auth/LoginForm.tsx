@@ -6,17 +6,21 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, type LoginValues } from "@/lib/authSchemas";
+import { forgotPasswordHref, loginNoticeText } from "@/lib/passwordReset";
 import { friendlyMessage } from "@/lib/photosApi";
 import { safeNextPath } from "@/lib/safeNext";
 import { buttonClasses } from "@/components/ui/Button";
 import { useAuth } from "./AuthProvider";
-import { errorId, Field, FormAlert, inputClass } from "./Field";
+import { errorId, Field, FormAlert, FormNotice, inputClass } from "./Field";
 import { PasswordInput } from "./PasswordInput";
 
 export function LoginForm() {
   const router = useRouter();
-  const nextParam = useSearchParams().get("next");
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next");
   const next = safeNextPath(nextParam);
+  // A fixed message picked by key, e.g. "Password updated" after a reset.
+  const notice = loginNoticeText(searchParams.get("notice"));
   const { user, loading, login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const alertRef = useRef<HTMLDivElement>(null);
@@ -57,6 +61,12 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+      {notice && (
+        <div role="status">
+          <FormNotice>{notice}</FormNotice>
+        </div>
+      )}
+
       {serverError && (
         <FormAlert ref={alertRef}>{serverError}</FormAlert>
       )}
@@ -83,6 +93,12 @@ export function LoginForm() {
           {...register("password")}
         />
       </Field>
+
+      <p className="-mt-2 text-right text-sm">
+        <Link href={forgotPasswordHref(nextParam)} className="font-medium text-primary underline underline-offset-4">
+          Forgot password?
+        </Link>
+      </p>
 
       <button type="submit" disabled={isSubmitting} className={buttonClasses("primary", "w-full disabled:opacity-60")}>
         {isSubmitting ? "Logging in…" : "Log in"}
