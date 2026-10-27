@@ -2,8 +2,11 @@ import type { StaticImageData } from "next/image";
 import baaratOnWheels from "@/app/assets/baarat-on-wheels.webp";
 import bandBajaDholHigh1 from "@/app/assets/band-baja-dhol-high-1.webp";
 import bandBajaDholHigh2 from "@/app/assets/band-baja-dhol-high-2.webp";
+import cake from "@/app/assets/cake.webp";
+import carnivalHaldiTheme from "@/app/assets/carnival-haldi-theme.webp";
 import catererMid3 from "@/app/assets/caterer-mid-3.webp";
 import couplePhotographyMid7 from "@/app/assets/couple-photography-mid-7.webp";
+import decor from "@/app/assets/decor.webp";
 import decorHaldiMid5 from "@/app/assets/decor-haldi-mid-5.webp";
 import decorHigh1 from "@/app/assets/decor-high-1.webp";
 import decorHigh2 from "@/app/assets/decor-high-2.webp";
@@ -24,9 +27,11 @@ import photographyMakeupHigh2 from "@/app/assets/photography-makeup-high-2.webp"
 import photographyMid5 from "@/app/assets/photography-mid-5.webp";
 import photographyVenueHigh2 from "@/app/assets/photography-venue-high-2.webp";
 import receptionDecorMid7 from "@/app/assets/reception-decor-mid-7.webp";
+import sangriaBar from "@/app/assets/sangria-bar.webp";
 import venuePhotographyHigh1 from "@/app/assets/venue-photography-high-1.webp";
 import venuePhotographyHigh3 from "@/app/assets/venue-photography-high-3.webp";
 import venuePhotographyMid from "@/app/assets/venue-photography-mid.webp";
+import vintageCar from "@/app/assets/vintage-car.webp";
 import vintageCarHigh1 from "@/app/assets/vintage-car-high-1.webp";
 import vintageCarHigh2 from "@/app/assets/vintage-car-high-2.webp";
 import weddingFavoursLow1 from "@/app/assets/wedding-favours-low-1.webp";
@@ -223,8 +228,8 @@ export const b2b = {
       name: "Liquor & Bar",
       text: "The bar is where the party gathers. Skilled bartenders, signature cocktails, lounge corners and smooth licensing turn sangeet and reception nights into celebrations everyone talks about.",
       image: photo(
-        receptionDecorMid7,
-        "Reception hall with chandeliers, candlelit tables and a bar",
+        sangriaBar,
+        "Sangria bar with a floral-print counter set up on a garden lawn",
       ),
     },
     {
@@ -286,8 +291,8 @@ export const b2b = {
       name: "Cake & Chocolate",
       text: "A cake-cutting at the reception or a chocolate counter at the cocktail night adds a sweet moment guests love to gather around.",
       image: photo(
-        catererMid3,
-        "Chefs serving at a buffet laid out in a palace courtyard",
+        cake,
+        "Tiered white wedding cake framed by glowing arches and flowers",
       ),
     },
     {
@@ -392,8 +397,8 @@ export type ServiceGroup = {
 };
 
 export const whatWeDoHero = photo(
-  couplePhotographyMid7,
-  "Couple posing between carved maroon arches and lanterns",
+  decor,
+  "Gold stage with a flower-crowned sculpted face, golden deer and lanterns",
 );
 
 export const serviceGroups: ServiceGroup[] = [
@@ -756,6 +761,13 @@ export const gallery: (Photo & { category: GalleryCategory })[] = [
     ),
   },
   {
+    category: "Décor",
+    ...photo(
+      decor,
+      "Gold stage with a flower-crowned sculpted face, golden deer and lanterns",
+    ),
+  },
+  {
     category: "Haldi",
     ...photo(
       haldiMid4,
@@ -805,6 +817,13 @@ export const gallery: (Photo & { category: GalleryCategory })[] = [
     ),
   },
   {
+    category: "Haldi",
+    ...photo(
+      carnivalHaldiTheme,
+      "Carnival-style haldi entrance of gold and pink heart arches over a striped aisle",
+    ),
+  },
+  {
     category: "Celebrations",
     ...photo(
       vintageCarHigh1,
@@ -823,6 +842,13 @@ export const gallery: (Photo & { category: GalleryCategory })[] = [
     ...photo(
       makeupPhotographyMid4,
       "Bride in a red lehenga and kundan jewellery posing beside roses",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      sangriaBar,
+      "Sangria bar with a floral-print counter set up on a garden lawn",
     ),
   },
   {
@@ -877,6 +903,13 @@ export const gallery: (Photo & { category: GalleryCategory })[] = [
   {
     category: "Celebrations",
     ...photo(
+      vintageCar,
+      "Groom and his brother in a flower-decked red vintage convertible",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
       baaratOnWheels,
       "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night",
     ),
@@ -907,6 +940,13 @@ export const gallery: (Photo & { category: GalleryCategory })[] = [
     ...photo(
       bandBajaDholHigh2,
       "Dhol players in maroon kurtas under a marigold canopy",
+    ),
+  },
+  {
+    category: "Celebrations",
+    ...photo(
+      cake,
+      "Tiered white wedding cake framed by glowing arches and flowers",
     ),
   },
   {

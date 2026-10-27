@@ -15,8 +15,11 @@
 import baaratOnWheels from "@/app/assets/baarat-on-wheels.webp";
 import bandBajaDholHigh1 from "@/app/assets/band-baja-dhol-high-1.webp";
 import bandBajaDholHigh2 from "@/app/assets/band-baja-dhol-high-2.webp";
+import cake from "@/app/assets/cake.webp";
+import carnivalHaldiTheme from "@/app/assets/carnival-haldi-theme.webp";
 import catererMid3 from "@/app/assets/caterer-mid-3.webp";
 import couplePhotographyMid7 from "@/app/assets/couple-photography-mid-7.webp";
+import decor from "@/app/assets/decor.webp";
 import decorHaldiMid5 from "@/app/assets/decor-haldi-mid-5.webp";
 import decorHigh1 from "@/app/assets/decor-high-1.webp";
 import decorHigh2 from "@/app/assets/decor-high-2.webp";
@@ -32,9 +35,11 @@ import photographyMakeupHigh2 from "@/app/assets/photography-makeup-high-2.webp"
 import photographyMid5 from "@/app/assets/photography-mid-5.webp";
 import photographyVenueHigh2 from "@/app/assets/photography-venue-high-2.webp";
 import receptionDecorMid7 from "@/app/assets/reception-decor-mid-7.webp";
+import sangriaBar from "@/app/assets/sangria-bar.webp";
 import venuePhotographyHigh1 from "@/app/assets/venue-photography-high-1.webp";
 import venuePhotographyHigh3 from "@/app/assets/venue-photography-high-3.webp";
 import venuePhotographyMid from "@/app/assets/venue-photography-mid.webp";
+import vintageCar from "@/app/assets/vintage-car.webp";
 import vintageCarHigh1 from "@/app/assets/vintage-car-high-1.webp";
 import vintageCarHigh2 from "@/app/assets/vintage-car-high-2.webp";
 import weddingFavoursLow1 from "@/app/assets/wedding-favours-low-1.webp";
@@ -57,6 +62,11 @@ export const partnerBasics = [
 ];
 
 const p = {
+  cake: photo(cake, "Tiered white wedding cake framed by glowing arches and flowers"),
+  carnivalHaldiTheme: photo(carnivalHaldiTheme, "Carnival-style haldi entrance of gold and pink heart arches over a striped aisle"),
+  decor: photo(decor, "Gold stage with a flower-crowned sculpted face, golden deer and lanterns"),
+  sangriaBar: photo(sangriaBar, "Sangria bar with a floral-print counter set up on a garden lawn"),
+  vintageCar: photo(vintageCar, "Groom and his brother in a flower-decked red vintage convertible"),
   baaratOnWheels: photo(baaratOnWheels, "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night"),
   bandBajaDholHigh1: photo(bandBajaDholHigh1, "Friends playing the dhol and dancing around the bride"),
   bandBajaDholHigh2: photo(bandBajaDholHigh2, "Dhol players in maroon kurtas under a marigold canopy"),
@@ -102,7 +112,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Live counters and chaat stations for mehendi and sangeet",
       "Menus coordinated with the bar, décor and timings of each event",
     ],
-    gallery: [p.catererMid3, p.receptionDecorMid7],
+    gallery: [p.catererMid3, p.sangriaBar, p.receptionDecorMid7],
     lookingFor: ["FSSAI registration and hygiene standards", "Capacity for both intimate and large weddings"],
   },
   decor: {
@@ -111,7 +121,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Mandaps, stages and photo corners for every function",
       "Evening lighting with lanterns, fairy lights and statement backdrops",
     ],
-    gallery: [p.decorHigh2, p.decorHigh1, p.decorHigh3, p.decorMid4, p.decorMid5],
+    gallery: [p.decorHigh2, p.decor, p.carnivalHaldiTheme, p.decorHigh1, p.decorHigh3, p.decorMid4, p.decorMid5],
     lookingFor: ["In-house florals and fabrication", "A team that can set up and strike on tight timelines"],
   },
   entertainment: {
@@ -155,7 +165,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Signature drinks and mocktail menus for every guest",
       "Lounge and hookah corners planned around venue rules",
     ],
-    gallery: [p.receptionDecorMid7, p.decorMid5],
+    gallery: [p.sangriaBar, p.receptionDecorMid7, p.decorMid5],
     lookingFor: ["Experienced bartenders and trained attendants", "Help with event liquor licences"],
   },
   mehendi: {
@@ -198,7 +208,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Vintage and luxury cars for the couple's entry and vidaai",
       "Decorated cars for couple photo shoots",
     ],
-    gallery: [p.vintageCarHigh1, p.vintageCarHigh2],
+    gallery: [p.vintageCarHigh1, p.vintageCar, p.vintageCarHigh2],
     lookingFor: ["Well-kept, insured vehicles", "Punctual, uniformed chauffeurs"],
   },
   "wedding-favours": {
@@ -214,7 +224,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Designer wedding and reception cakes",
       "Chocolate and dessert counters",
     ],
-    gallery: [p.catererMid3, p.receptionDecorMid7],
+    gallery: [p.cake, p.catererMid3, p.receptionDecorMid7],
     lookingFor: ["Fresh, hygienically prepared desserts", "Designs matched to the wedding's theme"],
   },
   permissions: {
@@ -248,7 +258,7 @@ export const vendorPages: Record<string, VendorPage> = {
       "Shuttles between the hotel and each venue",
       "Cars on call for the families",
     ],
-    gallery: [p.baaratOnWheels, p.vintageCarHigh2, p.vintageCarHigh1],
+    gallery: [p.baaratOnWheels, p.vintageCar, p.vintageCarHigh2, p.vintageCarHigh1],
     lookingFor: ["Clean, well-maintained vehicles", "Punctual drivers who know the city"],
   },
 };
