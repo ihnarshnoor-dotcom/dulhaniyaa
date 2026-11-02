@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildQuery, filtersFromParams, MAX_QUERY_LENGTH, normalizeQuery } from "./photoSearch";
+import { buildQuery, feedQuery, filtersFromParams, MAX_QUERY_LENGTH, normalizeQuery } from "./photoSearch";
 
 describe("normalizeQuery", () => {
   it("trims and collapses spaces", () => {
@@ -23,6 +23,19 @@ describe("buildQuery", () => {
 
   it("returns an empty string when nothing is set", () => {
     expect(buildQuery({ q: "  " })).toBe("");
+  });
+});
+
+describe("feedQuery", () => {
+  it("sends the source with the paging and filters", () => {
+    expect(feedQuery(0, {}, "photogram")).toBe("?source=photogram&page=0");
+    expect(feedQuery(2, { q: "pink lehenga", category: "lehenga" }, "community")).toBe(
+      "?source=community&q=pink+lehenga&category=lehenga&page=2",
+    );
+  });
+
+  it("leaves the source out when none is given", () => {
+    expect(feedQuery(1, { q: "haldi" })).toBe("?q=haldi&page=1");
   });
 });
 

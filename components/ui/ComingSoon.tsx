@@ -16,7 +16,7 @@ export function ComingSoon({ title, text }: { title: string; text: string }) {
             <h1 className="mt-3 text-5xl leading-tight sm:text-6xl">{title}</h1>
             <p className="mx-auto mt-4 max-w-sm leading-relaxed text-muted">{text}</p>
             <Button href="/budget-calculator" className="mt-8">
-              Try the budget calculator
+              Try the Wedding Budgetor
             </Button>
           </div>
         </div>

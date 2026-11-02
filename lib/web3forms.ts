@@ -103,3 +103,28 @@ export type EnquiryEmail = {
 
 export const sendEnquiryEmail = (enquiry: EnquiryEmail) =>
   submit({ ...enquiry, fromName: "Dulhaniyaa Website" }, "Enquiry");
+
+/* ───────────── Vendor Q&A answers ───────────── */
+
+export type QnaEmail = {
+  service: string;
+  name: string;
+  phone: string;
+  email: string;
+  /** One row per question, "Group · Question" → answer, in order. */
+  answers: Record<string, string>;
+};
+
+export async function sendQnaEmail({ service, name, phone, email, answers }: QnaEmail) {
+  console.log("[Qna] Sending answers to the team", { service, answers: Object.keys(answers).length });
+  await submit(
+    {
+      subject: `New ${service} Q&A: ${name}`,
+      fromName: "Dulhaniyaa Vendor Q&A",
+      replyTo: email,
+      fields: { Service: service, Name: name, Phone: phone, ...answers },
+    },
+    "Qna",
+  );
+  console.log("[Qna] Sent");
+}

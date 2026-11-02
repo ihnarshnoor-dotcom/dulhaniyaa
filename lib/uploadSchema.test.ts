@@ -10,7 +10,7 @@ const valid = {
   file: photo(),
   category: "lehenga",
   tags: ["pink"],
-  title: "",
+  title: "Pastel pink lehenga",
   caption: "",
   visibility: "public" as const,
 };
@@ -87,7 +87,12 @@ describe("uploadSchema", () => {
     expect(issuePaths(uploadSchema.safeParse({ ...valid, visibility: "friends" }))).toEqual(["visibility"]);
   });
 
-  it("trims the optional title and caption", () => {
+  it("requires a title", () => {
+    expect(issuePaths(uploadSchema.safeParse({ ...valid, title: "" }))).toEqual(["title"]);
+    expect(issuePaths(uploadSchema.safeParse({ ...valid, title: "   " }))).toEqual(["title"]);
+  });
+
+  it("trims the title and the optional caption", () => {
     const parsed = uploadSchema.parse({ ...valid, title: "  Pastel pink lehenga ", caption: " " });
     expect(parsed.title).toBe("Pastel pink lehenga");
     expect(parsed.caption).toBe("");

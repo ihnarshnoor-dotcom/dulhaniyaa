@@ -5,6 +5,7 @@ import { business, images, services } from "@/data/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
+import { PlannerBot } from "@/components/planner/PlannerBot";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import "./globals.css";
 
@@ -118,6 +119,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Footer />
         </AuthProvider>
         <WhatsAppFloat />
+        {/* Reads the current path to hide itself on /plan-my-wedding; see the Header note on Suspense. */}
+        <Suspense fallback={null}>
+          <PlannerBot />
+        </Suspense>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

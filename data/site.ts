@@ -139,8 +139,9 @@ export const business = {
 export const navLinks = [
   { href: "/", label: "Home" },
   { href: "/testimonials", label: "Testimonials" },
-  { href: "/budget-calculator", label: "Budget Calcy" },
+  { href: "/budget-calculator", label: "Wedding Budgetor" },
   { href: "/photogram", label: "Photogram" },
+  { href: "/community", label: "Community" },
 ];
 
 /** Links in the header and mobile menu. The rest of navLinks still appear in the footer and the sitemap. */
@@ -158,24 +159,15 @@ export const b2b = {
   label: "Dulhaniyaa B2B",
   href: "/vendors",
   intro:
-    "The partners behind every great wedding: venues, caterers, decorators, photographers and more, brought together in one place.",
+    "The partners behind every great wedding: makeup artists, decorators, bars and photographers, brought together in one place.",
   services: [
     {
-      slug: "venue",
-      name: "Venue",
-      text: "The venue decides almost everything else: guest count, décor, catering and the date itself. Farmhouses, banquet halls, palaces and destination resorts each set a different tone.",
+      slug: "makeup",
+      name: "Makeup",
+      text: "The bride's look is one of the most anticipated moments of the day. A skilled makeup artist makes sure she feels like herself, only more radiant, through hours of rituals and photos.",
       image: photo(
-        venuePhotographyMid,
-        "Bride and groom between carved pillars in a palace courtyard",
-      ),
-    },
-    {
-      slug: "catering",
-      name: "Catering",
-      text: "Guests remember the food. From chaat counters at the mehendi to a full wedding feast, catering shapes the energy of every event and is often the biggest single part of the budget.",
-      image: photo(
-        catererMid3,
-        "Chefs serving at a buffet laid out in a palace courtyard",
+        makeupPhotographyMid4,
+        "Bride in a red lehenga and kundan jewellery posing beside roses",
       ),
     },
     {
@@ -188,12 +180,12 @@ export const b2b = {
       ),
     },
     {
-      slug: "entertainment",
-      name: "Entertainment",
-      text: "Music carries the celebration from the dholki to the last dance. DJs, anchors, live acts and performers keep every function moving and every generation on the floor.",
+      slug: "liquor-bar",
+      name: "Liquor & Bar",
+      text: "The bar is where the party gathers. Skilled bartenders, signature cocktails, lounge corners and smooth licensing turn sangeet and reception nights into celebrations everyone talks about.",
       image: photo(
-        bandBajaDholHigh1,
-        "Friends playing the dhol and dancing around the bride",
+        sangriaBar,
+        "Sangria bar with a floral-print counter set up on a garden lawn",
       ),
     },
     {
@@ -206,114 +198,6 @@ export const b2b = {
       ),
     },
     {
-      slug: "invitation-cards",
-      name: "Invitation Cards",
-      text: "The invitation is the first glimpse of the wedding guests receive. Printed cards, gift boxes and digital invites set the tone and carry the itinerary for every function.",
-      image: photo(
-        weddingFavoursLow2,
-        "Illustrated wedding cards and tags tied with ribbon",
-      ),
-    },
-    {
-      slug: "makeup",
-      name: "Makeup",
-      text: "The bride's look is one of the most anticipated moments of the day. A skilled makeup artist makes sure she feels like herself, only more radiant, through hours of rituals and photos.",
-      image: photo(
-        makeupPhotographyMid4,
-        "Bride in a red lehenga and kundan jewellery posing beside roses",
-      ),
-    },
-    {
-      slug: "liquor-bar",
-      name: "Liquor & Bar",
-      text: "The bar is where the party gathers. Skilled bartenders, signature cocktails, lounge corners and smooth licensing turn sangeet and reception nights into celebrations everyone talks about.",
-      image: photo(
-        sangriaBar,
-        "Sangria bar with a floral-print counter set up on a garden lawn",
-      ),
-    },
-    {
-      slug: "mehendi",
-      name: "Mehendi",
-      text: "Mehendi is one of the most loved traditions: intricate designs for the bride, quick patterns for the guests, and an afternoon of music and laughter while the colour deepens.",
-      image: photo(
-        mehendiMid4,
-        "Mehendi artist applying an intricate bridal design to the bride's hand",
-      ),
-    },
-    {
-      slug: "hospitality",
-      name: "Hospitality",
-      text: "Out-of-town family needs looking after: rooms, check-ins, welcome kits and help desks make guests feel at home and keep the wedding running smoothly.",
-      image: photo(
-        photographyMid5,
-        "Couple and family walking along a palace corridor",
-      ),
-    },
-    {
-      slug: "band-baaja",
-      name: "Band Baaja/Ghodiwala",
-      text: "The baraat is pure celebration: a brass band, dhol, lights and the ghodi or buggy carrying the groom to the venue, with the whole family dancing along.",
-      image: photo(
-        bandBajaDholHigh2,
-        "Dhol players in maroon kurtas under a marigold canopy",
-      ),
-    },
-    {
-      slug: "pandit",
-      name: "Pandit/Priest",
-      text: "The ceremonies are the heart of the wedding. An experienced pandit guides the families through every ritual, from the roka to the pheras, explaining the meaning along the way.",
-      image: photo(
-        mandapDecorMid5,
-        "Bride and groom exchanging varmalas under a floral mandap in a palace courtyard",
-      ),
-    },
-    {
-      slug: "luxury-cars",
-      name: "Luxury Car Rental",
-      text: "The couple's arrival and departure are moments everyone watches. Vintage convertibles and luxury cars make the entry and the vidaai memorable, and look beautiful in photos.",
-      image: photo(
-        vintageCarHigh1,
-        "Baraat walking beside a vintage maroon car by the lake",
-      ),
-    },
-    {
-      slug: "wedding-favours",
-      name: "Wedding Favours",
-      text: "Favours are the thank-you guests take home: sweets, hampers and keepsakes that carry a little of the wedding with them.",
-      image: photo(
-        weddingFavoursLow1,
-        "Table of pastel favour boxes laid out on a lawn",
-      ),
-    },
-    {
-      slug: "cake-chocolate",
-      name: "Cake & Chocolate",
-      text: "A cake-cutting at the reception or a chocolate counter at the cocktail night adds a sweet moment guests love to gather around.",
-      image: photo(
-        cake,
-        "Tiered white wedding cake framed by glowing arches and flowers",
-      ),
-    },
-    {
-      slug: "permissions",
-      name: "Permissions & License",
-      text: "Police NOCs, DJ and sound permissions and event liquor licences keep a wedding legal and stress-free. Missing one can stop the music on the night.",
-      image: photo(
-        venuePhotographyHigh3,
-        "Bride and groom in a palace courtyard beside a reflecting pool",
-      ),
-    },
-    {
-      slug: "additional-services",
-      name: "Additional Services",
-      text: "Every wedding has its own extras: anchors for the ceremonies, guest management, last-minute help. The little things add up to a smooth day.",
-      image: photo(
-        decorHigh3,
-        "Outdoor lounge with sofas under draped arches and floral columns",
-      ),
-    },
-    {
       slug: "security-valet",
       name: "Security & Valet",
       text: "With hundreds of guests, cars and gifts, trained security and valet teams keep everyone safe and the arrivals smooth.",
@@ -322,17 +206,17 @@ export const b2b = {
         "Flower-decked white vintage car with a chauffeur outside a palace",
       ),
     },
-    {
-      slug: "transportation",
-      name: "Transportation",
-      text: "From airport pickups for out-of-town family to shuttles between the hotel and the venue, transport keeps everyone where they need to be, on time.",
-      image: photo(
-        baaratOnWheels,
-        "Guests dancing to the dhol beside a lit-up Baraat on Wheels bus at night",
-      ),
-    },
   ],
 };
+
+/**
+ * The service detail pages (/vendors/<service>) are hidden for now: every service link opens the
+ * Q&A straight away, and visiting a detail page redirects there. Set to true to bring them back.
+ */
+export const SHOW_VENDOR_DETAIL = false;
+
+export const vendorHref = (slug: string) =>
+  SHOW_VENDOR_DETAIL ? `/vendors/${slug}` : `/vendors/${slug}/questions`;
 
 /* ───────────────────────── HOME PHOTO ───────────────────────── */
 

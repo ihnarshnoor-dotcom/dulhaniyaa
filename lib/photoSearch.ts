@@ -20,6 +20,16 @@ export function buildQuery(params: Record<string, string | number | null | undef
 
 export type FeedFilters = { q: string; category: string };
 
+/** Which photos GET /photogram lists: the official Dulhaniyaa ones, or those uploaded by the community. */
+export type PhotoSource = "photogram" | "community";
+
+/**
+ * The GET /photogram query string. Without a `source` the backend lists community photos, so
+ * callers always pass one; it is optional only so an older backend can still be called.
+ */
+export const feedQuery = (page: number, filters: Partial<FeedFilters> = {}, source?: PhotoSource) =>
+  buildQuery({ source, q: filters.q, category: filters.category, page });
+
 /** Reads Photogram filters from the page URL, dropping anything invalid. */
 export function filtersFromParams(params: { get(name: string): string | null }): FeedFilters {
   const category = params.get("category") ?? "";

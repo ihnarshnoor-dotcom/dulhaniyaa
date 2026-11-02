@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { b2b, business } from "@/data/site";
+import { b2b, business, vendorHref } from "@/data/site";
 import { partnerBasics, vendorPages } from "@/data/vendors";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
@@ -46,7 +46,7 @@ export default function VendorsPage() {
               .map((s) => (
                 <Link
                   key={s.slug}
-                  href={`/vendors/${s.slug}`}
+                  href={vendorHref(s.slug)}
                   prefetch
                   className="group flex flex-col overflow-hidden rounded-3xl border border-ink/10 bg-white/60 shadow-md shadow-ink/5 transition-shadow hover:shadow-2xl hover:shadow-primary/15"
                 >

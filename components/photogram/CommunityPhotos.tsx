@@ -3,14 +3,33 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { SaveToBucket } from "@/components/buckets/SaveToBucket";
 import { SharePhoto } from "@/components/share/SharePhoto";
 import { buttonClasses } from "@/components/ui/Button";
 import { CloseIcon, SearchIcon } from "@/components/ui/Icons";
 import { categoryLabel, photoCategories } from "@/lib/photoCategories";
-import { friendlyMessage, getPhotogram, isPhotosApiEnabled, photoAlt, type ApiPhoto } from "@/lib/photosApi";
-import { buildQuery, filtersFromParams, MAX_QUERY_LENGTH, normalizeQuery, type FeedFilters } from "@/lib/photoSearch";
+import {
+  friendlyMessage,
+  getPhotogram,
+  imageAlt,
+  isPhotosApiEnabled,
+  type ApiPhoto,
+} from "@/lib/photosApi";
+import {
+  buildQuery,
+  filtersFromParams,
+  MAX_QUERY_LENGTH,
+  normalizeQuery,
+  type FeedFilters,
+} from "@/lib/photoSearch";
 import { gsap, useGSAP } from "@/lib/gsap";
 import { tilt, untilt } from "./PhotoBento";
 import { PhotoPreview, toPreviewPhoto } from "./PhotoPreview";
@@ -22,13 +41,21 @@ function syncUrl(filters: FeedFilters) {
   const params = new URLSearchParams(window.location.search);
   params.delete("q");
   params.delete("category");
-  const query = buildQuery({ ...Object.fromEntries(params), q: filters.q, category: filters.category });
-  window.history.replaceState(window.history.state, "", `${window.location.pathname}${query}${window.location.hash}`);
+  const query = buildQuery({
+    ...Object.fromEntries(params),
+    q: filters.q,
+    category: filters.category,
+  });
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${query}${window.location.hash}`,
+  );
 }
 
 /**
- * Photos shared by the community through the photos API, shown under the curated Photogram,
- * with search and category filters. Renders nothing when the photos API is off.
+ * Photos shared by the community through the photos API, with search and category filters. The /community
+ * page supplies the heading. Renders nothing when the photos API is off.
  */
 export function CommunityPhotos() {
   if (!isPhotosApiEnabled) return null;
@@ -40,11 +67,16 @@ export function CommunityPhotos() {
   );
 }
 
-type Status = { state: "loading" } | { state: "ready" } | { state: "error"; message: string };
+type Status =
+  | { state: "loading" }
+  | { state: "ready" }
+  | { state: "error"; message: string };
 
 function CommunityFeed() {
   const searchParams = useSearchParams();
-  const [filters, setFilters] = useState<FeedFilters>(() => filtersFromParams(searchParams));
+  const [filters, setFilters] = useState<FeedFilters>(() =>
+    filtersFromParams(searchParams),
+  );
   const [queryInput, setQueryInput] = useState(filters.q);
   const [photos, setPhotos] = useState<ApiPhoto[]>([]);
   const [loadedKey, setLoadedKey] = useState<string | null>(null);
@@ -69,7 +101,7 @@ function CommunityFeed() {
     const controller = new AbortController();
     const key = filterKey(filters);
     currentKey.current = key;
-    getPhotogram(0, filters, controller.signal)
+    getPhotogram(0, filters, { source: "community", signal: controller.signal })
       .then((page) => {
         setPhotos(page.photos);
         setNextPage(page.nextPage);
@@ -104,17 +136,19 @@ function CommunityFeed() {
     () => {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.utils.toArray<HTMLElement>("[data-tile]:not([data-shown])").forEach((tile) => {
-          tile.dataset.shown = "";
-          gsap.from(tile, {
-            autoAlpha: 0,
-            y: 40,
-            scale: 0.94,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: { trigger: tile, start: "top 92%", once: true },
+        gsap.utils
+          .toArray<HTMLElement>("[data-tile]:not([data-shown])")
+          .forEach((tile) => {
+            tile.dataset.shown = "";
+            gsap.from(tile, {
+              autoAlpha: 0,
+              y: 40,
+              scale: 0.94,
+              duration: 0.8,
+              ease: "power3.out",
+              scrollTrigger: { trigger: tile, start: "top 92%", once: true },
+            });
           });
-        });
       });
     },
     { scope: results, dependencies: [photos] },
@@ -129,7 +163,7 @@ function CommunityFeed() {
     setLoadingMore(true);
     setMoreError(null);
     try {
-      const page = await getPhotogram(nextPage, filters);
+      const page = await getPhotogram(nextPage, filters, { source: "community" });
       // The filters changed while this page was loading: drop it.
       if (key !== currentKey.current) return;
       setPhotos((current) => {
@@ -151,28 +185,23 @@ function CommunityFeed() {
 
   const close = useCallback(() => {
     setOpenIndex(null);
-    requestAnimationFrame(() => lastOpened.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() =>
+      lastOpened.current?.focus({ preventScroll: true }),
+    );
   }, []);
 
   const chipClass = (active: boolean) =>
     `shrink-0 rounded-full px-4 py-2 text-sm transition-colors ${active ? "bg-primary text-white" : "bg-secondary/60 text-primary hover:bg-secondary"}`;
 
   return (
-    <section aria-labelledby="community-heading" className="mt-20 sm:mt-28">
-      <div className="mb-8 flex flex-col items-center gap-4 text-center">
-        <p className="text-xs font-medium tracking-[0.25em] text-primary uppercase">Community</p>
-        <h2 id="community-heading" className="text-4xl leading-tight sm:text-5xl">
-          From our community
-        </h2>
-        <p className="max-w-md leading-relaxed text-muted">Looks, details and moments shared by our brides and their families.</p>
-        <Link href="/account/upload" className="text-sm font-medium text-primary underline underline-offset-4">
-          Upload your photo
-        </Link>
-      </div>
-
+    <section id="community" aria-label="Community photos">
       {/* Search and category filters */}
       <div className="mb-10 flex flex-col items-center gap-4">
-        <form role="search" onSubmit={(e) => e.preventDefault()} className="relative w-full max-w-md">
+        <form
+          role="search"
+          onSubmit={(e) => e.preventDefault()}
+          className="relative w-full max-w-md"
+        >
           <label htmlFor="photogram-search" className="sr-only">
             Search community photos
           </label>
@@ -199,7 +228,11 @@ function CommunityFeed() {
             </button>
           )}
         </form>
-        <div role="group" aria-label="Filter by category" className="flex max-w-full flex-wrap justify-center gap-2">
+        <div
+          role="group"
+          aria-label="Filter by category"
+          className="flex max-w-full flex-wrap justify-center gap-2"
+        >
           <button
             type="button"
             aria-pressed={filters.category === ""}
@@ -213,7 +246,12 @@ function CommunityFeed() {
               key={c}
               type="button"
               aria-pressed={filters.category === c}
-              onClick={() => applyFilters({ ...filters, category: filters.category === c ? "" : c })}
+              onClick={() =>
+                applyFilters({
+                  ...filters,
+                  category: filters.category === c ? "" : c,
+                })
+              }
               className={chipClass(filters.category === c)}
             >
               {categoryLabel(c)}
@@ -226,7 +264,10 @@ function CommunityFeed() {
         {status.state === "loading" && <FeedSkeleton />}
 
         {status.state === "error" && (
-          <div role="alert" className="mx-auto max-w-md rounded-lg bg-red-50 p-4 text-center text-sm text-red-800">
+          <div
+            role="alert"
+            className="mx-auto max-w-md rounded-lg bg-red-50 p-4 text-center text-sm text-red-800"
+          >
             <p>{status.message}</p>
             <button
               type="button"
@@ -246,14 +287,21 @@ function CommunityFeed() {
             {filtered ? (
               <>
                 No community photos match your search.{" "}
-                <button type="button" onClick={clearFilters} className="font-medium text-primary underline underline-offset-4">
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="font-medium text-primary underline underline-offset-4"
+                >
                   Clear filters
                 </button>
               </>
             ) : (
               <>
                 No community photos yet.{" "}
-                <Link href="/account/upload" className="font-medium text-primary underline underline-offset-4">
+                <Link
+                  href="/account/upload"
+                  className="font-medium text-primary underline underline-offset-4"
+                >
                   Be the first to share one.
                 </Link>
               </>
@@ -276,12 +324,12 @@ function CommunityFeed() {
                     }}
                     onPointerMove={tilt}
                     onPointerLeave={untilt}
-                    aria-label={`Open photo: ${photoAlt(photo)}`}
+                    aria-label={imageAlt(photo) ? `Open photo: ${imageAlt(photo)}` : "Open photo"}
                     className="group relative block size-full overflow-hidden rounded-2xl shadow-md shadow-ink/5 transition-[transform,box-shadow] duration-300 ease-out transform-[rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] hover:z-10 hover:shadow-2xl hover:shadow-primary/20 sm:rounded-3xl"
                   >
                     <Image
                       src={photo.thumb_url ?? photo.url}
-                      alt={photoAlt(photo)}
+                      alt={imageAlt(photo)}
                       fill
                       unoptimized
                       sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
@@ -293,13 +341,18 @@ function CommunityFeed() {
                       className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 [background:radial-gradient(circle_at_var(--gx,50%)_var(--gy,50%),rgb(255_255_255/0.28),transparent_55%)]"
                     />
                     <span className="absolute inset-x-2 bottom-2 flex translate-y-3 items-center justify-between gap-2 rounded-full bg-white/70 px-3 py-1.5 text-left text-xs text-ink opacity-0 backdrop-blur-md transition duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
-                      <span className="truncate">{categoryLabel(photo.category)}</span>
+                      <span className="truncate">
+                        {categoryLabel(photo.category)}
+                      </span>
                       <span aria-hidden className="shrink-0">
                         ⤢
                       </span>
                     </span>
                   </button>
-                  <SaveToBucket photo={photo} className="absolute top-2 right-2 z-10" />
+                  <SaveToBucket
+                    photo={photo}
+                    className="absolute top-2 right-2 z-10"
+                  />
                 </li>
               ))}
             </ul>
@@ -312,7 +365,15 @@ function CommunityFeed() {
                   </p>
                 )}
                 {nextPage !== null && (
-                  <button type="button" onClick={loadMore} disabled={loadingMore} className={buttonClasses("secondary", "disabled:opacity-60")}>
+                  <button
+                    type="button"
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                    className={buttonClasses(
+                      "secondary",
+                      "disabled:opacity-60",
+                    )}
+                  >
                     {loadingMore ? "Loading…" : "Load more"}
                   </button>
                 )}
@@ -324,15 +385,23 @@ function CommunityFeed() {
 
       {openIndex !== null && photos.length > 0 && (
         <PhotoPreview
-          photos={photos.map(toPreviewPhoto)}
+          photos={photos.map((p) => ({ ...toPreviewPhoto(p), alt: imageAlt(p) }))}
           index={Math.min(openIndex, photos.length - 1)}
           onClose={close}
           onChange={setOpenIndex}
           actions={(i) =>
             photos[i] && (
               <>
-                <SaveToBucket key={`save-${photos[i].id}`} photo={photos[i]} variant="labelled" />
-                <SharePhoto key={`share-${photos[i].id}`} photo={photos[i]} variant="labelled" />
+                <SaveToBucket
+                  key={`save-${photos[i].id}`}
+                  photo={photos[i]}
+                  variant="labelled"
+                />
+                <SharePhoto
+                  key={`share-${photos[i].id}`}
+                  photo={photos[i]}
+                  variant="labelled"
+                />
               </>
             )
           }
@@ -344,9 +413,16 @@ function CommunityFeed() {
 
 function FeedSkeleton() {
   return (
-    <div role="status" aria-label="Loading community photos" className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+    <div
+      role="status"
+      aria-label="Loading community photos"
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4"
+    >
       {Array.from({ length: 8 }, (_, i) => (
-        <div key={i} className="shimmer aspect-square rounded-2xl sm:rounded-3xl" />
+        <div
+          key={i}
+          className="shimmer aspect-square rounded-2xl sm:rounded-3xl"
+        />
       ))}
     </div>
   );

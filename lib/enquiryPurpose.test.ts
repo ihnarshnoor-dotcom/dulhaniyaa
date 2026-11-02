@@ -14,7 +14,7 @@ describe("purposeFromParams", () => {
 
 describe("purposes", () => {
   it("knows every vendor service and the general options", () => {
-    expect(isPurpose("vendor:pandit")).toBe(true);
+    expect(isPurpose("vendor:security-valet")).toBe(true);
     expect(isPurpose("vendor:other")).toBe(true);
     expect(isPurpose("other")).toBe(true);
     expect(isPurpose("vendor:")).toBe(false);

@@ -14,7 +14,7 @@ import {
 const validRegister = {
   name: "Anaya Sharma",
   email: "anaya@example.com",
-  phone: "",
+  phone: "+91 98765 43210",
   password: "password123",
   confirmPassword: "password123",
 };
@@ -38,8 +38,13 @@ describe("loginSchema", () => {
 });
 
 describe("registerSchema", () => {
-  it("accepts valid details with no phone", () => {
+  it("accepts valid details", () => {
     expect(registerSchema.safeParse(validRegister).success).toBe(true);
+  });
+
+  it.each(["", "   "])("requires a phone number (%j), with one clear message", (phone) => {
+    const result = registerSchema.safeParse({ ...validRegister, phone });
+    expect(result.error?.issues.map((i) => [i.path.join("."), i.message])).toEqual([["phone", "Enter your phone number"]]);
   });
 
   it.each(["+91 (98765) 432-10", "9876543210", "+447911123456", "0098 7654 3210 12"])("accepts phone %j", (phone) => {

@@ -97,23 +97,14 @@ const p = {
 };
 
 export const vendorPages: Record<string, VendorPage> = {
-  venue: {
+  makeup: {
     work: [
-      "Weddings at farmhouses, banquet halls and destination venues",
-      "Layouts planned for every function at one venue",
-      "Site visits and bookings matched to the couple's dates",
+      "Bridal looks from traditional red-and-gold to soft and natural",
+      "Party makeup for the family on the big day",
+      "Touch-ups through rituals, photos and the reception",
     ],
-    gallery: [p.venuePhotographyMid, p.venuePhotographyHigh3, p.venuePhotographyHigh1, p.photographyVenueHigh2],
-    lookingFor: ["Clear capacity and availability", "Flexibility with outside décor and catering partners"],
-  },
-  catering: {
-    work: [
-      "Wedding feasts planned around the couple's family favourites",
-      "Live counters and chaat stations for mehendi and sangeet",
-      "Menus coordinated with the bar, décor and timings of each event",
-    ],
-    gallery: [p.catererMid3, p.sangriaBar, p.receptionDecorMid7],
-    lookingFor: ["FSSAI registration and hygiene standards", "Capacity for both intimate and large weddings"],
+    gallery: [p.makeupPhotographyMid4, p.photographyMakeupHigh2, p.photographyLow6, p.venuePhotographyHigh1],
+    lookingFor: ["A portfolio of bridal looks", "Artists available for early-morning starts"],
   },
   decor: {
     work: [
@@ -124,14 +115,14 @@ export const vendorPages: Record<string, VendorPage> = {
     gallery: [p.decorHigh2, p.decor, p.carnivalHaldiTheme, p.decorHigh1, p.decorHigh3, p.decorMid4, p.decorMid5],
     lookingFor: ["In-house florals and fabrication", "A team that can set up and strike on tight timelines"],
   },
-  entertainment: {
+  "liquor-bar": {
     work: [
-      "DJs and anchors who keep every function on schedule",
-      "Choreographers and performers for the sangeet",
-      "Grand entries with cold-fire sparklers and live acts",
+      "Bars for cocktail nights, sangeets and receptions",
+      "Signature drinks and mocktail menus for every guest",
+      "Lounge and hookah corners planned around venue rules",
     ],
-    gallery: [p.bandBajaDholHigh1, p.haldiMid3, p.receptionDecorMid7, p.decorMid4],
-    lookingFor: ["Professional sound and lighting equipment", "Sound limits respected at every venue"],
+    gallery: [p.sangriaBar, p.receptionDecorMid7, p.decorMid5],
+    lookingFor: ["Experienced bartenders and trained attendants", "Help with event liquor licences"],
   },
   photography: {
     work: [
@@ -142,108 +133,6 @@ export const vendorPages: Record<string, VendorPage> = {
     gallery: [p.couplePhotographyMid7, p.photographyMid5, p.photographyMakeupHigh2, p.photographyVenueHigh2, p.venuePhotographyHigh1],
     lookingFor: ["A consistent editing style", "Delivery timelines for photos and films agreed up front"],
   },
-  "invitation-cards": {
-    work: [
-      "Printed cards, gift boxes and itinerary booklets",
-      "Digital invites and RSVPs for every function",
-    ],
-    gallery: [p.weddingFavoursLow2, p.photographyLow6, p.makeupPhotographyMid4],
-    lookingFor: ["Proofing before print", "Reliable delivery across the city"],
-  },
-  makeup: {
-    work: [
-      "Bridal looks from traditional red-and-gold to soft and natural",
-      "Party makeup for the family on the big day",
-      "Touch-ups through rituals, photos and the reception",
-    ],
-    gallery: [p.makeupPhotographyMid4, p.photographyMakeupHigh2, p.photographyLow6, p.venuePhotographyHigh1],
-    lookingFor: ["A portfolio of bridal looks", "Artists available for early-morning starts"],
-  },
-  "liquor-bar": {
-    work: [
-      "Bars for cocktail nights, sangeets and receptions",
-      "Signature drinks and mocktail menus for every guest",
-      "Lounge and hookah corners planned around venue rules",
-    ],
-    gallery: [p.sangriaBar, p.receptionDecorMid7, p.decorMid5],
-    lookingFor: ["Experienced bartenders and trained attendants", "Help with event liquor licences"],
-  },
-  mehendi: {
-    work: [
-      "Intricate bridal mehendi, including personalised motifs",
-      "Teams for quick guest designs at busy mehendi functions",
-    ],
-    gallery: [p.mehendiMid4, p.makeupPhotographyMid4],
-    lookingFor: ["Natural, chemical-free henna", "A team that can scale for large guest lists"],
-  },
-  hospitality: {
-    work: [
-      "Hotel room blocks and check-ins for guests",
-      "Welcome hampers and help desks at the hotel",
-      "Itineraries so every guest knows where to be",
-    ],
-    gallery: [p.photographyMid5, p.vintageCarHigh2, p.venuePhotographyHigh3],
-    lookingFor: ["Hotels and staff experienced with wedding groups", "Clear room rates and block policies"],
-  },
-  "band-baaja": {
-    work: [
-      "Brass bands, dhol players and light carriers for the baraat",
-      "Ghodi, buggies and decorated chhatris",
-      "Baraat timings coordinated with the venue",
-    ],
-    gallery: [p.bandBajaDholHigh2, p.bandBajaDholHigh1, p.baaratOnWheels, p.vintageCarHigh1],
-    lookingFor: ["Well-cared-for horses and safe handling", "Punctual teams who respect noise limits"],
-  },
-  pandit: {
-    work: [
-      "Pandits for roka, haldi, the pheras and other rituals",
-      "Puja samagri arranged for each ceremony",
-      "Muhurat and timings shared in advance with the families",
-    ],
-    gallery: [p.mandapDecorMid5, p.photographyVenueHigh2, p.decorHaldiMid5],
-    lookingFor: ["Knowledge of different regional traditions", "Clear, warm explanations for the families"],
-  },
-  "luxury-cars": {
-    work: [
-      "Vintage and luxury cars for the couple's entry and vidaai",
-      "Decorated cars for couple photo shoots",
-    ],
-    gallery: [p.vintageCarHigh1, p.vintageCar, p.vintageCarHigh2],
-    lookingFor: ["Well-kept, insured vehicles", "Punctual, uniformed chauffeurs"],
-  },
-  "wedding-favours": {
-    work: [
-      "Mithai boxes and personalised hampers",
-      "Return gifts matched to each function",
-    ],
-    gallery: [p.weddingFavoursLow1, p.weddingFavoursLow2],
-    lookingFor: ["Custom packaging and branding", "Reliable delivery to the venue"],
-  },
-  "cake-chocolate": {
-    work: [
-      "Designer wedding and reception cakes",
-      "Chocolate and dessert counters",
-    ],
-    gallery: [p.cake, p.catererMid3, p.receptionDecorMid7],
-    lookingFor: ["Fresh, hygienically prepared desserts", "Designs matched to the wedding's theme"],
-  },
-  permissions: {
-    work: [
-      "Police NOC and DJ/sound permissions",
-      "Event liquor licences",
-      "Permissions checklists shared with every family",
-    ],
-    gallery: [p.venuePhotographyHigh3, p.venuePhotographyMid],
-    lookingFor: ["Knowledge of local rules and timelines", "Paperwork filed well before the wedding"],
-  },
-  "additional-services": {
-    work: [
-      "Guest management and help desks",
-      "Extra hands for setup and coordination on the day",
-    ],
-    gallery: [p.decorHigh3, p.photographyMid5, p.decorHaldiMid5],
-    lookingFor: ["Flexible teams who can step in at short notice", "Clear rates for on-demand help"],
-  },
   "security-valet": {
     work: [
       "Security staff for the venue and gift table",
@@ -251,14 +140,5 @@ export const vendorPages: Record<string, VendorPage> = {
     ],
     gallery: [p.vintageCarHigh2, p.venuePhotographyMid, p.venuePhotographyHigh3],
     lookingFor: ["Trained, uniformed staff", "Insurance and background-checked teams"],
-  },
-  transportation: {
-    work: [
-      "Airport and station pickups for guests",
-      "Shuttles between the hotel and each venue",
-      "Cars on call for the families",
-    ],
-    gallery: [p.baaratOnWheels, p.vintageCar, p.vintageCarHigh2, p.vintageCarHigh1],
-    lookingFor: ["Clean, well-maintained vehicles", "Punctual drivers who know the city"],
   },
 };

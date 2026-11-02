@@ -44,8 +44,8 @@ export function SharedLink({ token }: { token: string }) {
         <p className="mt-3 leading-relaxed text-muted">
           The person who shared it may have turned it off, or it ran out of time. Ask them for a new one.
         </p>
-        <Button href="/photogram" className="mt-6">
-          Browse Photogram
+        <Button href="/community" className="mt-6">
+          Browse community photos
         </Button>
       </div>
     );
@@ -84,8 +84,8 @@ function SinglePhoto({ photo }: { photo: ApiPhoto }) {
         {photo.caption && <p className="mt-3 leading-relaxed text-muted">{photo.caption}</p>}
         <p className="mt-3 text-sm text-muted">{categoryLabel(photo.category)}</p>
       </figcaption>
-      <Button href="/photogram" className="mt-10">
-        See more on Photogram
+      <Button href="/community" className="mt-10">
+        See more community photos
       </Button>
     </figure>
   );

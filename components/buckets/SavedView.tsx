@@ -336,11 +336,11 @@ function EmptyState({ query, bucket, hasBuckets, onClear }: { query: string; buc
       <p className="font-serif text-3xl">{bucket ? "This collection is empty" : "Nothing saved yet"}</p>
       <p className="mx-auto mt-3 max-w-sm leading-relaxed text-muted">
         {hasBuckets
-          ? "Browse Photogram and tap the bookmark on any photo to add it to a collection."
-          : "Browse Photogram and tap the bookmark on any photo to start your first collection."}
+          ? "Browse community photos and tap the bookmark on any photo to add it to a collection."
+          : "Browse community photos and tap the bookmark on any photo to start your first collection."}
       </p>
-      <Button href="/photogram" className="mt-6">
-        Browse Photogram
+      <Button href="/community" className="mt-6">
+        Browse community photos
       </Button>
     </div>
   );

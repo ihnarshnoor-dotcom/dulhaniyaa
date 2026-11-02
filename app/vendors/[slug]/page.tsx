@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
-import { b2b, business } from "@/data/site";
+import { SHOW_VENDOR_DETAIL, b2b, business, vendorHref } from "@/data/site";
 import { partnerBasics, vendorPages } from "@/data/vendors";
+import { vendorQuestions } from "@/data/vendorQuestions";
 import { Container } from "@/components/ui/Container";
 import { Reveal } from "@/components/ui/Reveal";
 import { CheckIcon } from "@/components/ui/Icons";
@@ -46,8 +47,7 @@ function ServiceSkeleton() {
   return (
     <div aria-busy="true" aria-label="Loading">
       <Container className="pt-12 pb-24 sm:pt-16">
-        <div className="shimmer h-4 w-28 rounded-full" />
-        <div className="mt-6 grid items-center gap-8 md:grid-cols-2 md:gap-14">
+        <div className="grid items-center gap-8 md:grid-cols-2 md:gap-14">
           <div className="space-y-4">
             <div className="shimmer h-3 w-32 rounded-full" />
             <div className="shimmer h-14 w-3/4 rounded-2xl" />
@@ -64,7 +64,10 @@ function ServiceSkeleton() {
 async function ServiceContent({ params }: Pick<PageProps<"/vendors/[slug]">, "params">) {
   const found = find((await params).slug);
   if (!found) notFound();
+  // Hidden for now: send visitors to the Q&A instead (see SHOW_VENDOR_DETAIL).
+  if (!SHOW_VENDOR_DETAIL) redirect(vendorHref(found.service.slug));
   const { service, page } = found;
+  const questions = vendorQuestions[service.slug];
   const others = b2b.services.filter((s) => s.slug !== service.slug && vendorPages[s.slug]);
 
   return (
@@ -72,10 +75,7 @@ async function ServiceContent({ params }: Pick<PageProps<"/vendors/[slug]">, "pa
       {/* Intro */}
       <section className="pt-12 pb-14 sm:pt-16 sm:pb-20">
         <Container>
-          <Link href="/vendors" className="text-sm text-muted transition-colors hover:text-primary">
-            ← All services
-          </Link>
-          <div className="mt-6 grid items-center gap-8 md:grid-cols-2 md:gap-14">
+          <div className="grid items-center gap-8 md:grid-cols-2 md:gap-14">
             <div>
               <p className="hero-fade text-xs font-medium tracking-[0.25em] text-primary uppercase">Partner with us</p>
               <h1 className="hero-fade mt-3 text-5xl leading-[1.05] [animation-delay:100ms] sm:text-6xl">{service.name}</h1>
@@ -137,6 +137,27 @@ async function ServiceContent({ params }: Pick<PageProps<"/vendors/[slug]">, "pa
         </Container>
       </section>
 
+      {/* Q&A call to action */}
+      {questions && (
+        <section aria-labelledby="questions-heading" className="pb-16 sm:pb-24">
+          <Container className="max-w-3xl">
+            <Reveal className="rounded-4xl bg-secondary/50 p-8 text-center sm:p-12">
+              <p className="text-xs font-medium tracking-[0.25em] text-primary uppercase">Planning your wedding?</p>
+              <h2 id="questions-heading" className="mt-3 text-4xl sm:text-5xl">
+                Find your {service.name.toLowerCase()} match
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl leading-relaxed text-muted">{questions.intro}</p>
+              <p className="mt-2 text-sm text-muted">
+                {questions.groups.length} quick screens · just tap your answers
+              </p>
+              <Button href={`/vendors/${service.slug}/questions`} className="mt-8">
+                Start the Q&amp;A
+              </Button>
+            </Reveal>
+          </Container>
+        </section>
+      )}
+
       {/* What we look for + enquire */}
       <section aria-labelledby="partners-heading" className="pb-20 sm:pb-28">
         <Container className="max-w-3xl">
@@ -167,7 +188,7 @@ async function ServiceContent({ params }: Pick<PageProps<"/vendors/[slug]">, "pa
           </h2>
           <nav className="mt-4 flex flex-wrap justify-center gap-2">
             {others.map((s) => (
-              <Link key={s.slug} href={`/vendors/${s.slug}`} prefetch className="rounded-full bg-secondary/60 px-4 py-2 text-sm text-primary transition-colors hover:bg-secondary">
+              <Link key={s.slug} href={vendorHref(s.slug)} prefetch className="rounded-full bg-secondary/60 px-4 py-2 text-sm text-primary transition-colors hover:bg-secondary">
                 {s.name}
               </Link>
             ))}
