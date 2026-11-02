@@ -112,7 +112,7 @@ export function UploadForm() {
     form.append("category", values.category);
     form.append("tags", values.tags.join(","));
     form.append("visibility", values.visibility);
-    if (values.title) form.append("title", values.title);
+    form.append("title", values.title);
     if (values.caption) form.append("caption", values.caption);
     try {
       setUploaded(await uploadImage(form));
@@ -139,7 +139,7 @@ export function UploadForm() {
         <h2 className="mt-6 text-4xl">Photo uploaded</h2>
         <p className="mx-auto mt-3 max-w-md leading-relaxed text-muted">
           {isPublic
-            ? `"${photoAlt(uploaded)}" is now on Photogram for everyone to see.`
+            ? `"${photoAlt(uploaded)}" is now in community photos for everyone to see.`
             : `"${photoAlt(uploaded)}" is private. Only you can see it.`}
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
@@ -147,8 +147,8 @@ export function UploadForm() {
             View my uploads
           </Link>
           {isPublic && (
-            <Link href="/photogram" className={buttonClasses("secondary")}>
-              View on Photogram
+            <Link href="/community" className={buttonClasses("secondary")}>
+              View in community photos
             </Link>
           )}
         </div>
@@ -320,7 +320,7 @@ export function UploadForm() {
         </div>
       </div>
 
-      <Field label="Title (optional)" id="title" error={errors.title?.message}>
+      <Field label="Title *" id="title" error={errors.title?.message}>
         <input
           id="title"
           autoComplete="off"

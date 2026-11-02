@@ -3,16 +3,17 @@
  * Separate from the AI facilitator in lib/facilitator.ts, which uses FACILITATOR_URL.
  *
  * Browser only: call these from client components after mount.
- * The backend is https://api.dulhaniyaa.in unless NEXT_PUBLIC_BACKEND_URL says otherwise
- * (e.g. a local backend). Setting it to an empty value switches every backend feature off.
+ * The backend address comes from BACKEND_URL, through lib/backendUrl.ts (the only place that reads it).
+ * Setting it to an empty value switches every backend feature off.
  *
  * Login: the access token lives in memory only (lib/authSession.ts) and the refresh token in an
  * httpOnly cookie, so every call to /login and /auth/* sends credentials.
  */
 
+import { BACKEND_URL } from "./backendUrl";
 import { browserLocks, createTokenStore, sendWithAuth, singleFlight, type TokenResponse } from "./authSession";
 import { errorFromResponse, NETWORK_MESSAGE, PhotosApiError } from "./photosApiErrors";
-import { buildQuery, type FeedFilters } from "./photoSearch";
+import { buildQuery, feedQuery, type FeedFilters, type PhotoSource } from "./photoSearch";
 import {
   addedMemberOf,
   collectionInfoOf,
@@ -30,10 +31,9 @@ import { sharedLinkOf, shareRequestBody, type SharedLink } from "./share";
 
 export { EMAIL_NOT_FOUND_MESSAGE, friendlyMessage, isInvalidResetCode, MAKE_PUBLIC_MESSAGE, PhotosApiError } from "./photosApiErrors";
 
-export const DEFAULT_BACKEND_URL = "https://api.dulhaniyaa.in";
-
-// Trailing slashes are trimmed so "…/" + "/me" doesn't become "//me".
-const BASE = (process.env.NEXT_PUBLIC_BACKEND_URL ?? DEFAULT_BACKEND_URL).trim().replace(/\/+$/, "");
+/** The backend address without a trailing slash, or "" when the backend is switched off. */
+export { BACKEND_URL };
+const BASE = BACKEND_URL;
 
 export const isPhotosApiEnabled = BASE !== "";
 
@@ -51,6 +51,8 @@ export type User = { id: string; email: string; name: string; phone: string | nu
 export type ApiPhoto = {
   id: string;
   title: string | null;
+  /** Alt text. Optional: the backend may not send it yet. */
+  alt?: string | null;
   caption?: string | null;
   category: string;
   tags: string[];
@@ -60,7 +62,11 @@ export type ApiPhoto = {
   thumb_url: string | null;
   created_at?: string;
   save_count?: number;
+  /** Which feed it belongs to. Optional: older backends don't send it. */
+  source?: PhotoSource;
 };
+
+export type { PhotoSource };
 
 /** One of the signed-in user's own photos (from uploads or /me/uploads). */
 export type OwnPhoto = ApiPhoto & { caption: string | null; created_at: string };
@@ -79,8 +85,15 @@ export type SavedPage = { photos: SavedPhoto[]; nextCursor: string | null };
  */
 export type CollectionPage = SavedPage & { bucket: CollectionInfo | null; hiddenPrivateCount: number };
 
-/** Alt text: title, then caption, then category. */
-export const photoAlt = (p: ApiPhoto) => p.title?.trim() || p.caption?.trim() || p.category || "Photo";
+/** A readable name for a photo in button labels and messages: title, then caption, then category. */
+export const photoAlt = (p: Pick<ApiPhoto, "title" | "caption" | "category">) =>
+  p.title?.trim() || p.caption?.trim() || p.category || "Photo";
+
+/**
+ * The `alt` attribute for Photogram and community photo images: the photo's alt text, then its
+ * title, else empty. Plain text: React escapes it, so never render it as HTML.
+ */
+export const imageAlt = (p: Pick<ApiPhoto, "alt" | "title">) => p.alt?.trim() || p.title?.trim() || "";
 
 /* ───────────── Session ───────────── */
 
@@ -213,7 +226,7 @@ function field(data: unknown, key: string): unknown {
 
 /* ───────────── Auth ───────────── */
 
-export type SignupInput = { email: string; password: string; name: string; phone?: string };
+export type SignupInput = { email: string; password: string; name: string; phone: string };
 
 export const signup = (input: SignupInput) => request<{ id: string }>("/signup", { method: "POST", body: input });
 
@@ -263,11 +276,23 @@ export async function resetPassword(input: ResetPasswordInput): Promise<void> {
 /* ───────────── Photos ───────────── */
 
 /**
- * Public Photogram feed, newest first, 30 per page. No login needed.
+ * Public photo feed, newest first, 30 per page. No login needed. `source` picks the official
+ * Photogram photos or the community's; the backend lists community photos when it is left out.
  * `q` matches title, caption, category and tags; `category` is an exact filter.
  */
-export async function getPhotogram(page = 0, filters: Partial<FeedFilters> = {}, signal?: AbortSignal): Promise<FeedPage> {
-  const data = await request<unknown>(`/photogram${buildQuery({ q: filters.q, category: filters.category, page })}`, { signal });
+export async function getPhotogram(
+  page = 0,
+  filters: Partial<FeedFilters> = {},
+  { source, signal }: { source?: PhotoSource; signal?: AbortSignal } = {},
+): Promise<FeedPage> {
+  return feedPageOf(await request<unknown>(`/photogram${feedQuery(page, filters, source)}`, { signal }), page);
+}
+
+/**
+ * Reads one GET /photogram response (`page` is the page that was asked for). Shared by the browser
+ * client above and the server-side fetch in lib/photogramServer.ts.
+ */
+export function feedPageOf(data: unknown, page: number): FeedPage {
   const photos = imagesOf<ApiPhoto>(data);
   const nextPage = field(data, "nextPage");
   if (Array.isArray(data)) return { photos, nextPage: photos.length > 0 ? page + 1 : null };
@@ -291,8 +316,12 @@ function savedPage(data: unknown): SavedPage {
   return { photos, nextCursor: typeof nextCursor === "string" && nextCursor ? nextCursor : null };
 }
 
-/** Fields: image (file), category, tags (comma-separated), visibility, and optional title and caption. */
-export const uploadImage = (form: FormData) => request<OwnPhoto>("/images", { method: "POST", body: form, auth: true });
+/**
+ * Fields: image (file), category, tags (comma-separated), visibility, and optional title, alt and caption.
+ * `quiet401`: when the session has ended, end it here without going to /login (bulk upload keeps its list).
+ */
+export const uploadImage = (form: FormData, { quiet401 = false }: { quiet401?: boolean } = {}) =>
+  request<OwnPhoto>("/images", { method: "POST", body: form, auth: true, quiet401 });
 
 export const setVisibility = async (id: string, visibility: Visibility) => {
   await request<unknown>(`/images/${encodeURIComponent(id)}/visibility`, {

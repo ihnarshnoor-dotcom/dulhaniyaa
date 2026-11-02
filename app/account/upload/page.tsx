@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { PageHero } from "@/components/ui/PageHero";
+import { BulkUploadLink } from "@/components/account/BulkUploadLink";
 import { UploadForm } from "@/components/account/UploadForm";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { isPhotosApiEnabled } from "@/lib/photosApi";
@@ -21,6 +22,7 @@ export default function UploadPage() {
       <section className="pb-24 sm:pb-32">
         <Container className="max-w-2xl">
           <RequireAuth>
+            <BulkUploadLink />
             <UploadForm />
           </RequireAuth>
         </Container>

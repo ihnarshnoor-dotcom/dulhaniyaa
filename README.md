@@ -26,6 +26,26 @@ Use a single settings file, `.env.local` (delete any old `.env`). Without `WEB3F
 the contact form and the budget calculator can't send emails, and without `FACILITATOR_URL` the
 budget calculator can't load. See `.env.example` for every setting.
 
+`BACKEND_URL` is the only backend setting. `next.config.ts` copies it into `NEXT_PUBLIC_BACKEND_URL` at build
+time so browser code gets the same value, and `lib/backendUrl.ts` is the one place the code reads it. A
+production build (`npm run build`, or Vercel) stops with an error if it isn't set. An older `.env.local` that only
+sets `NEXT_PUBLIC_BACKEND_URL` still works.
+
+| Setting | Needed? | What it does |
+| --- | --- | --- |
+| `FACILITATOR_URL` | Required | AI facilitator: budget calculator and "Plan my wedding" chat |
+| `WEB3FORMS_ACCESS_KEY` | Required | Sends every form's emails |
+| `BACKEND_URL` | Required on Vercel | Photos backend (accounts, uploads, Photogram, collections). `https://api.dulhaniyaa.in` on Vercel, `http://localhost:4000` in `.env.local`. Empty switches those features off |
+| `NEXT_PUBLIC_PHOTOGRAM_UPLOADER_EMAIL` | Optional | The official Photogram account's email; only it sees the hidden bulk upload screen (see below) |
+| `LEADS_SCRIPT_URL`, `LEADS_SCRIPT_SECRET` | Optional, secret | Copies form leads into a Google Sheet |
+| `SITE_URL` | Optional | Live website address, for SEO. Defaults to `https://dulhaniyaa.com` |
+| `WHATSAPP_NUMBER` | Optional | Number for every WhatsApp button |
+
+`NEXT_PUBLIC_PHOTOGRAM_UPLOADER_EMAIL` is the official Photogram account's email. Only that account sees the
+hidden bulk upload screen at `/account/upload/bulk` (and a "Bulk upload" link on the upload page); everyone else
+gets a 404. It only hides the screen: the backend's `PHOTOGRAM_UPLOADER_EMAIL` decides whose uploads become
+Photogram photos, so set both to the same address.
+
 Other commands:
 
 ```bash
@@ -116,7 +136,8 @@ Enquiries are **not stored in a database** yet. They're emailed only.
 1. Push this project to GitHub.
 2. Go to https://vercel.com/new and import the repository. Vercel detects Next.js automatically.
 3. Before clicking **Deploy**, open **Environment Variables** and add every key from `.env.example`:
-   `FACILITATOR_URL`, `NEXT_PUBLIC_BACKEND_URL`, `WEB3FORMS_ACCESS_KEY`, `SITE_URL`, `WHATSAPP_NUMBER`.
+   `FACILITATOR_URL`, `BACKEND_URL` (`https://api.dulhaniyaa.in`), `WEB3FORMS_ACCESS_KEY`, `SITE_URL`, `WHATSAPP_NUMBER`,
+   and optionally `NEXT_PUBLIC_PHOTOGRAM_UPLOADER_EMAIL`.
 4. Click **Deploy**. Every later push to `main` redeploys automatically.
 
 If you change an environment variable later, redeploy (Deployments → ⋯ → Redeploy) so it takes effect.

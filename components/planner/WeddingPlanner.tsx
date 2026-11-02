@@ -1,53 +1,38 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { buttonClasses } from "@/components/ui/Button";
 import { CheckIcon } from "@/components/ui/Icons";
-import { eventOptions } from "@/lib/budget";
 import { saveHandoff } from "@/lib/plannerHandoff";
 import {
-  PlannerChatError,
-  sendChat,
-  type ChatMessage,
-} from "@/lib/plannerChat";
+  Bubble,
+  ChatError,
+  ChipGroup,
+  TypingBubble,
+  chipClasses,
+  eventNames,
+  eventQuestion,
+  followUps,
+  startQuestions,
+  usePlannerChat,
+} from "./ChatParts";
 import { ReplyText } from "./ReplyText";
 
-const startQuestions = [
-  "What happens in an Indian wedding?",
-  "Walk me through the wedding events in order.",
-];
-const followUps = [
-  "What should we book first?",
-  "When should we start planning?",
-  "What does the family need to do?",
-  "Which rituals need a pandit?",
-];
-const eventQuestion = (event: string) => `What happens at the ${event}?`;
-const eventNames = eventOptions.map((e) => e.name);
-
-function errorText(err: unknown) {
-  if (err instanceof PlannerChatError && err.message === "NETWORK")
-    return "We couldn't reach our planner. Check your connection and try again.";
-  return "Our planner couldn't answer just now. Please try again.";
-}
+const MAX_QUESTION = 500;
 
 /**
- * "Plan my wedding": a tap-only chat that explains what happens at an Indian wedding.
- * Visitors never type; every question is a button. Events they add go to the budget calculator.
+ * "Plan my wedding": a chat that explains what happens at an Indian wedding.
+ * Visitors tap a suggested question or type their own. Events they add go to the budget calculator.
  */
 export function WeddingPlanner() {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { messages, pending, error, ask, retry, asked } = usePlannerChat();
   // The event the latest answer was about, so we can offer "Add it to my wedding".
   const [topic, setTopic] = useState<string | null>(null);
   const [added, setAdded] = useState<string[]>([]);
+  const [draft, setDraft] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
-  const controller = useRef<AbortController | null>(null);
-
-  useEffect(() => () => controller.current?.abort(), []);
 
   // Keep the newest message in view.
   useEffect(() => {
@@ -61,32 +46,17 @@ export function WeddingPlanner() {
     });
   }, [messages.length, pending, error]);
 
-  async function ask(question: string, history: ChatMessage[] = messages) {
-    const next: ChatMessage[] = [
-      ...history,
-      { role: "user", content: question },
-    ];
-    setMessages(next);
-    setError(null);
-    setPending(true);
+  function askAbout(question: string) {
     setTopic(eventNames.find((e) => question === eventQuestion(e)) ?? null);
-    controller.current?.abort();
-    controller.current = new AbortController();
-    try {
-      const reply = await sendChat(next, controller.current.signal);
-      setMessages([...next, { role: "assistant", content: reply }]);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      setError(errorText(err));
-    } finally {
-      setPending(false);
-    }
+    void ask(question);
   }
 
-  // Ask the last question again (it is still at the end of the list, unanswered).
-  function retry() {
-    const last = messages.at(-1);
-    if (last?.role === "user") void ask(last.content, messages.slice(0, -1));
+  function sendDraft(e: FormEvent) {
+    e.preventDefault();
+    const question = draft.trim();
+    if (!question || pending) return;
+    setDraft("");
+    askAbout(question);
   }
 
   function toggleAdded(event: string) {
@@ -102,16 +72,7 @@ export function WeddingPlanner() {
     router.push("/budget-calculator");
   }
 
-  const asked = new Set(
-    messages.filter((m) => m.role === "user").map((m) => m.content),
-  );
   const started = messages.length > 0;
-  const chip = (done: boolean) =>
-    `rounded-full border px-4 py-2 text-sm transition-colors disabled:opacity-50 ${
-      done
-        ? "border-ink/10 bg-white/40 text-muted hover:border-primary/40"
-        : "border-primary/30 bg-white/70 text-primary hover:border-primary hover:bg-secondary/40"
-    }`;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -125,8 +86,8 @@ export function WeddingPlanner() {
         <Bubble from="assistant">
           <p>
             Namaste! I&apos;m here to help you picture your wedding: the events,
-            what happens at each, and what to plan for. Tap a question below to
-            begin.
+            what happens at each, and what to plan for. Tap a question below or
+            type your own to begin.
           </p>
         </Bubble>
 
@@ -140,39 +101,8 @@ export function WeddingPlanner() {
           </Bubble>
         ))}
 
-        {pending && (
-          <Bubble from="assistant">
-            <span
-              role="status"
-              aria-label="Planner is typing"
-              className="flex gap-1.5 py-1.5"
-            >
-              {[0, 150, 300].map((d) => (
-                <span
-                  key={d}
-                  className="size-2 animate-bounce rounded-full bg-primary/50 motion-reduce:animate-none"
-                  style={{ animationDelay: `${d}ms` }}
-                />
-              ))}
-            </span>
-          </Bubble>
-        )}
-
-        {error && (
-          <div
-            role="alert"
-            className="rounded-2xl bg-red-50 p-4 text-sm text-red-800"
-          >
-            {error}{" "}
-            <button
-              type="button"
-              onClick={retry}
-              className="font-semibold text-primary underline underline-offset-4"
-            >
-              Try again
-            </button>
-          </div>
-        )}
+        {pending && <TypingBubble />}
+        {error && <ChatError message={error} onRetry={retry} />}
         <div ref={endRef} />
       </div>
 
@@ -200,6 +130,30 @@ export function WeddingPlanner() {
         </div>
       )}
 
+      {/* Type a question */}
+      <form onSubmit={sendDraft} className="mt-6 flex gap-2">
+        <label htmlFor="planner-question" className="sr-only">
+          Ask our planner a question
+        </label>
+        <input
+          id="planner-question"
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          maxLength={MAX_QUESTION}
+          autoComplete="off"
+          placeholder="Ask anything about your wedding…"
+          className="min-w-0 flex-1 rounded-full border border-ink/15 bg-white/80 px-5 py-3 text-[0.95rem] text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none"
+        />
+        <button
+          type="submit"
+          disabled={pending || !draft.trim()}
+          className={buttonClasses("primary", "shrink-0 disabled:opacity-50")}
+        >
+          Send
+        </button>
+      </form>
+
       {/* Questions to tap */}
       <div className="mt-8 space-y-5">
         {!started && (
@@ -209,8 +163,8 @@ export function WeddingPlanner() {
                 key={q}
                 type="button"
                 disabled={pending}
-                onClick={() => ask(q)}
-                className={chip(false)}
+                onClick={() => askAbout(q)}
+                className={chipClasses(false)}
               >
                 {q}
               </button>
@@ -224,8 +178,8 @@ export function WeddingPlanner() {
               key={e}
               type="button"
               disabled={pending}
-              onClick={() => ask(eventQuestion(e))}
-              className={chip(asked.has(eventQuestion(e)))}
+              onClick={() => askAbout(eventQuestion(e))}
+              className={chipClasses(asked.has(eventQuestion(e)))}
             >
               {added.includes(e) && (
                 <CheckIcon
@@ -248,8 +202,8 @@ export function WeddingPlanner() {
                   key={q}
                   type="button"
                   disabled={pending}
-                  onClick={() => ask(q)}
-                  className={chip(false)}
+                  onClick={() => askAbout(q)}
+                  className={chipClasses(false)}
                 >
                   {q}
                 </button>
@@ -259,7 +213,7 @@ export function WeddingPlanner() {
       </div>
 
       {/* Hand off to the calculator */}
-      <div className="sticky bottom-4 z-10 mt-10 flex flex-col items-center gap-2 rounded-3xl border border-ink/10 bg-ivory/90 p-4 text-center shadow-xl shadow-ink/5 backdrop-blur-md sm:flex-row sm:justify-between sm:text-left">
+      <div className="mt-10 flex flex-col items-center gap-2 rounded-3xl border border-ink/10 bg-white/60 p-4 text-center shadow-xl shadow-ink/5 sm:flex-row sm:justify-between sm:text-left">
         <p className="text-sm text-muted">
           {added.length > 0 ? (
             <>
@@ -267,7 +221,7 @@ export function WeddingPlanner() {
               <span className="font-medium text-ink">{added.join(" · ")}</span>
             </>
           ) : (
-            "Ready for prices? Add events as you go, or pick them in the calculator."
+            "Ready for prices? Add events as you go, or pick them in the Wedding Budgetor."
           )}
         </p>
         <button
@@ -278,47 +232,6 @@ export function WeddingPlanner() {
           Get my quote →
         </button>
       </div>
-    </div>
-  );
-}
-
-function Bubble({
-  from,
-  children,
-}: {
-  from: ChatMessage["role"];
-  children: ReactNode;
-}) {
-  const mine = from === "user";
-  return (
-    <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-[85%] rounded-3xl px-5 py-3 text-[0.95rem] leading-relaxed sm:max-w-[80%] ${
-          mine
-            ? "rounded-br-lg bg-primary text-white"
-            : "rounded-bl-lg border border-ink/10 bg-white/70 text-ink"
-        }`}
-      >
-        {!mine && <span className="sr-only">Planner: </span>}
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function ChipGroup({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div role="group" aria-label={label}>
-      <p className="mb-2 text-xs font-medium tracking-[0.2em] text-muted uppercase">
-        {label}
-      </p>
-      <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
 }

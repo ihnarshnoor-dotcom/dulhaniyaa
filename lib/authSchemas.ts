@@ -43,7 +43,8 @@ export const registerSchema = z
     phone: z
       .string()
       .trim()
-      .refine((v) => v === "" || phonePattern.test(normalizePhone(v)), "Enter 10 to 15 digits, optionally starting with +, or leave it blank"),
+      .min(1, { error: "Enter your phone number", abort: true })
+      .refine((v) => phonePattern.test(normalizePhone(v)), "Enter 10 to 15 digits, optionally starting with +"),
     password: newPassword,
     confirmPassword,
   })

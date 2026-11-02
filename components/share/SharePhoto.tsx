@@ -16,12 +16,15 @@ export function SharePhoto({
   className = "",
 }: {
   photo: ApiPhoto;
-  /** "icon": small round button for photo cards. "labelled": pill with text, for the full-screen preview. */
-  variant?: "icon" | "labelled";
+  /**
+   * "icon": small round button for photo cards. "overlay": round white button on top of a photo, matching
+   * the "Add to collection" one. "labelled": pill with text, for the full-screen preview.
+   */
+  variant?: "icon" | "overlay" | "labelled";
   className?: string;
 }) {
   const isPublic = canSharePhoto(photo);
-  if (variant === "labelled" && !isPublic) return null;
+  if (variant !== "icon" && !isPublic) return null;
 
   return (
     <ShareDialog
@@ -46,6 +49,17 @@ export function SharePhoto({
             className={`grid size-8 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-secondary/60 hover:text-primary disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:hover:bg-transparent aria-disabled:hover:text-muted ${className}`}
           >
             <ShareIcon width={16} height={16} />
+          </button>
+        ) : variant === "overlay" ? (
+          <button
+            type="button"
+            onClick={open}
+            disabled={loading}
+            aria-label={`Share "${photoAlt(photo)}"`}
+            title="Share photo"
+            className={`grid size-10 place-items-center rounded-full bg-white/85 text-primary shadow-md backdrop-blur-md transition hover:scale-105 hover:bg-white disabled:opacity-60 ${className}`}
+          >
+            <ShareIcon width={18} height={18} />
           </button>
         ) : (
           <button

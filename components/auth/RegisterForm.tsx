@@ -115,7 +115,7 @@ export function RegisterForm() {
         />
       </Field>
 
-      <Field label="Phone" id="phone" error={errors.phone?.message}>
+      <Field label="Phone *" id="phone" error={errors.phone?.message}>
         <input
           id="phone"
           type="tel"

@@ -220,10 +220,10 @@ function EmptyState({ isOwner, ownerName, hiddenCount }: { isOwner: boolean; own
       <div className="rounded-3xl border border-dashed border-ink/20 px-6 py-14 text-center">
         <p className="font-serif text-3xl">This collection is empty</p>
         <p className="mx-auto mt-3 max-w-sm leading-relaxed text-muted">
-          Browse Photogram and tap the bookmark on any photo to add it to this collection.
+          Browse community photos and tap the bookmark on any photo to add it to this collection.
         </p>
-        <Button href="/photogram" className="mt-6">
-          Browse Photogram
+        <Button href="/community" className="mt-6">
+          Browse community photos
         </Button>
       </div>
     );
@@ -236,8 +236,8 @@ function EmptyState({ isOwner, ownerName, hiddenCount }: { isOwner: boolean; own
           ? `Every photo in this collection is private, so only ${ownerName} can see them. Private photos are never shown to the people a collection is shared with.`
           : `${ownerName} hasn't added any photos to this collection yet.`}
       </p>
-      <Button href="/photogram" className="mt-6">
-        Browse Photogram
+      <Button href="/community" className="mt-6">
+        Browse community photos
       </Button>
     </div>
   );

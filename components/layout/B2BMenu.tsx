@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useId, useRef, useState, type PointerEvent } from "react";
-import { b2b } from "@/data/site";
+import { b2b, vendorHref } from "@/data/site";
 import { gsap, useGSAP } from "@/lib/gsap";
+import { navPill, navText } from "./navItem";
 
 /**
  * "Dulhaniyaa B2B ▾" in the header. The label goes to /vendors; the dropdown of services opens on hover
@@ -98,12 +99,13 @@ export function B2BMenu({ active }: { active: boolean }) {
           setOpen(false);
       }}
     >
-      <div className="flex items-center gap-0.5">
+      {/* Label and arrow share one pill, raised when a B2B page is open. */}
+      <div className={`flex items-center gap-0.5 ${navPill} pr-1.5 ${active ? "neu-raised" : ""}`}>
         <Link
           href={b2b.href}
           onNavigate={() => setOpen(false)}
           aria-current={active ? "page" : undefined}
-          className={`text-sm tracking-wide transition-colors ${active ? "text-muted" : "text-muted hover:text-ink"}`}
+          className={`text-sm tracking-wide transition-colors ${navText(active)}`}
         >
           {b2b.label}
         </Link>
@@ -114,7 +116,7 @@ export function B2BMenu({ active }: { active: boolean }) {
           aria-expanded={open}
           aria-controls={listId}
           aria-label={`${b2b.label} services`}
-          className={`grid size-6 place-items-center rounded-full transition-colors hover:bg-secondary/60 ${active ? "text-primary" : "text-muted hover:text-ink"}`}
+          className={`grid size-6 place-items-center rounded-full transition-colors hover:bg-secondary/60 ${navText(active)}`}
         >
           <svg
             aria-hidden
@@ -137,16 +139,15 @@ export function B2BMenu({ active }: { active: boolean }) {
         ref={panel}
         id={listId}
         inert={!open}
-        className="invisible absolute top-full left-1/2 z-50 w-120 origin-top -translate-x-1/2 pt-3 opacity-0"
+        className="invisible absolute top-full left-1/2 z-50 w-56 origin-top -translate-x-1/2 pt-3 opacity-0"
       >
         <div className="overflow-hidden rounded-2xl border border-ink/10 bg-ivory py-1.5 shadow-xl shadow-ink/10">
           {/* <p className="border-b border-ink/10 px-4 pt-1 pb-2.5 text-xs text-muted">For wedding businesses</p> */}
-          {/* Two columns keep all the services in view without a very tall list. */}
-          <ul className="grid grid-cols-2 px-1.5 py-1">
+          <ul className="flex flex-col px-1.5 py-1">
             {b2b.services.map((s) => (
               <li key={s.slug}>
                 <Link
-                  href={`${b2b.href}/${s.slug}`}
+                  href={vendorHref(s.slug)}
                   prefetch
                   onNavigate={() => setOpen(false)}
                   className="block rounded-lg px-3 py-1.5 text-sm text-ink transition-colors hover:bg-secondary/50 focus:bg-secondary/50 focus:outline-none"

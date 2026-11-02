@@ -1,12 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type PointerEvent,
+  type ReactNode,
+} from "react";
 import type { Photo } from "@/data/site";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { PhotoPreview } from "./PhotoPreview";
 
-type BentoPhoto = Photo & { category?: string };
+/** `thumbSrc`: a smaller file for one-cell and portrait tiles; large tiles and the preview use `src`. */
+export type BentoPhoto = Photo & { category?: string; thumbSrc?: string };
 
 /**
  * Landscape photos at these positions (repeating every 18 tiles) are shown
@@ -16,11 +25,15 @@ type BentoPhoto = Photo & { category?: string };
 const FEATURE_CYCLE = 18;
 const FEATURE_AT = new Set([0, 10, 16]);
 
+/** Tiles near the top of the page whose photos load straight away (pass as `eager`). */
+export const ABOVE_THE_FOLD = 6;
+
 /**
  * Tile size follows the photo's shape so as little as possible is cropped.
  * One grid cell is roughly 3:2.
  */
-function tileClass(photo: Photo, i: number, total: number) {
+function tileClass(photo: Photo, i: number, total: number, uniform: boolean) {
+  if (uniform) return "";
   const ratio = photo.width / photo.height;
   if (ratio < 0.85) return "row-span-2"; // portrait
   if (ratio >= 2.4) return "col-span-2"; // panorama / side-by-side collage
@@ -52,10 +65,39 @@ export function untilt(e: PointerEvent<HTMLButtonElement>) {
   el.style.setProperty("--ry", "0deg");
 }
 
-export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
+const subscribeNothing = () => () => {};
+
+/** True while React hydrates server HTML, false when the component is first rendered in the browser. */
+const useHydrating = () =>
+  useSyncExternalStore(
+    subscribeNothing,
+    () => false,
+    () => true,
+  );
+
+export function PhotoBento({
+  photos,
+  actions,
+  previewActions,
+  uniform = false,
+  eager = 0,
+}: {
+  photos: BentoPhoto[];
+  /** Every tile one cell, ignoring photo shapes (used while the shapes are still unknown). */
+  uniform?: boolean;
+  /** How many tiles from the top load their image straight away; the rest load as they near the screen. */
+  eager?: number;
+  /** Buttons on the tile's top-right corner, e.g. save and share. */
+  actions?: (index: number) => ReactNode;
+  /** Buttons beside the photo in the full-screen preview. */
+  previewActions?: (index: number) => ReactNode;
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const grid = useRef<HTMLDivElement>(null);
   const lastOpened = useRef<HTMLButtonElement | null>(null);
+  // Tiles in the server HTML are on screen before this code runs: hiding them to animate them in would make them blink.
+  const hydrating = useHydrating();
+  const fromServer = useRef(hydrating);
 
   const close = useCallback(() => {
     setOpenIndex(null);
@@ -66,11 +108,16 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
   // Close the preview if Next.js hides this page in the background.
   useLayoutEffect(() => () => setOpenIndex(null), []);
 
+  const tiles = photos.map((photo, i) => tileClass(photo, i, photos.length, uniform));
+
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.utils.toArray<HTMLElement>("[data-tile]").forEach((tile) => {
+        // Only tiles not animated yet, so photos added by "Load more" rise in without replaying the rest.
+        gsap.utils.toArray<HTMLElement>("[data-tile]:not([data-shown])").forEach((tile) => {
+          tile.dataset.shown = "";
+          if (fromServer.current && tile.getBoundingClientRect().top < window.innerHeight) return;
           gsap.from(tile, {
             autoAlpha: 0,
             y: 40,
@@ -81,9 +128,12 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
           });
         });
       });
+      fromServer.current = false;
+      // Tiles may have moved (new photos, or the uniform grid becoming the bento): re-measure scroll positions.
+      ScrollTrigger.refresh();
       return () => mm.revert();
     },
-    { scope: grid },
+    { scope: grid, dependencies: [photos, uniform] },
   );
 
   return (
@@ -93,7 +143,7 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
         className="grid grid-flow-dense auto-rows-30 grid-cols-2 gap-3 perspective-distant sm:auto-rows-40 sm:grid-cols-3 sm:gap-4 lg:auto-rows-46 lg:grid-cols-4"
       >
         {photos.map((photo, i) => (
-          <div key={photo.src} data-tile className={tileClass(photo, i, photos.length)}>
+          <div key={photo.src} data-tile className={`relative ${tiles[i]}`}>
             <button
               type="button"
               onClick={(e) => {
@@ -102,13 +152,15 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
               }}
               onPointerMove={tilt}
               onPointerLeave={untilt}
-              aria-label={`Open photo: ${photo.alt}`}
+              aria-label={photo.alt ? `Open photo: ${photo.alt}` : "Open photo"}
               className="group relative block size-full overflow-hidden rounded-2xl shadow-md shadow-ink/5 transition-[transform,box-shadow] duration-300 ease-out transform-[rotateX(var(--rx,0deg))_rotateY(var(--ry,0deg))] hover:z-10 hover:shadow-2xl hover:shadow-primary/20 sm:rounded-3xl"
             >
               <Image
-                src={photo.src}
+                src={photo.thumbSrc && !tiles[i].includes("col-span-2") ? photo.thumbSrc : photo.src}
                 alt={photo.alt}
                 fill
+                loading={i < eager ? "eager" : "lazy"}
+                unoptimized={photo.unoptimized}
                 sizes="(min-width: 1024px) 50vw, (min-width: 640px) 66vw, 100vw"
                 placeholder={photo.blurDataURL ? "blur" : "empty"}
                 blurDataURL={photo.blurDataURL}
@@ -128,12 +180,19 @@ export function PhotoBento({ photos }: { photos: BentoPhoto[] }) {
                 </span>
               </span>
             </button>
+            {actions && <div className="absolute top-2 right-2 z-10 flex gap-2">{actions(i)}</div>}
           </div>
         ))}
       </div>
 
-      {openIndex !== null && (
-        <PhotoPreview photos={photos} index={openIndex} onClose={close} onChange={setOpenIndex} />
+      {openIndex !== null && photos.length > 0 && (
+        <PhotoPreview
+          photos={photos}
+          index={Math.min(openIndex, photos.length - 1)}
+          onClose={close}
+          onChange={setOpenIndex}
+          actions={previewActions}
+        />
       )}
     </>
   );

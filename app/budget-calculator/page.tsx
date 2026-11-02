@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { BudgetCalculator } from "@/components/budget/BudgetCalculator";
 
 export const metadata: Metadata = {
-  title: "Wedding Budget Calculator",
+  title: "Wedding Budgetor",
   description:
     "Tap through a few quick choices and get a personalised wedding plan and estimate: event-wise services, a timeline and a budget check.",
   alternates: { canonical: "/budget-calculator" },
@@ -29,7 +29,7 @@ export default function BudgetCalculatorPage() {
 
       <Container className="max-w-4xl pt-14 pb-24 sm:pt-20 sm:pb-32">
         <div className="mb-10 text-center">
-          <p className="hero-fade text-xs font-medium tracking-[0.25em] text-primary uppercase">Budget Calcy</p>
+          <p className="hero-fade text-xs font-medium tracking-[0.25em] text-primary uppercase">Wedding Budgetor</p>
           <h1 className="hero-fade mt-3 text-5xl leading-[1.05] [animation-delay:100ms] sm:text-6xl">
             Plan your wedding in a few taps
           </h1>

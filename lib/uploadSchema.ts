@@ -23,16 +23,25 @@ export function imageFileError(file: FileLike): string | null {
   return null;
 }
 
-/** Lowercase, trimmed, single-spaced, without commas. */
-export const normalizeTag = (raw: string) =>
-  raw.replace(/,/g, " ").trim().replace(/\s+/g, " ").toLowerCase().slice(0, MAX_TAG_LENGTH);
+/** Lowercase, trimmed, single-spaced, without commas, cut to `maxLength`. */
+export const normalizeTag = (raw: string, maxLength = MAX_TAG_LENGTH) =>
+  raw.replace(/,/g, " ").trim().replace(/\s+/g, " ").toLowerCase().slice(0, maxLength);
 
-/** Adds one or more comma-separated tags, skipping blanks and duplicates, up to MAX_TAGS. */
-export function addTags(existing: string[], raw: string): string[] {
+export type TagLimits = { maxTags: number; maxLength: number };
+
+/**
+ * Adds one or more comma-separated tags, skipping blanks and duplicates. The limits default to the
+ * single upload form's (MAX_TAGS tags of up to 30 characters); bulk upload passes its own.
+ */
+export function addTags(
+  existing: string[],
+  raw: string,
+  { maxTags, maxLength }: TagLimits = { maxTags: MAX_TAGS, maxLength: MAX_TAG_LENGTH },
+): string[] {
   const next = [...existing];
   for (const part of raw.split(",")) {
-    const tag = normalizeTag(part);
-    if (tag && !next.includes(tag) && next.length < MAX_TAGS) next.push(tag);
+    const tag = normalizeTag(part, maxLength);
+    if (tag && !next.includes(tag) && next.length < maxTags) next.push(tag);
   }
   return next;
 }
@@ -50,7 +59,7 @@ export const uploadSchema = z.object({
     .array(z.string())
     .min(1, "Add at least one tag")
     .max(MAX_TAGS, `Use up to ${MAX_TAGS} tags`),
-  title: z.string().trim().max(120, "Please keep the title under 120 characters"),
+  title: z.string().trim().min(1, "Add a title").max(120, "Please keep the title under 120 characters"),
   caption: z.string().trim().max(1000, "Please keep the caption under 1000 characters"),
   visibility: z.enum(["public", "private"]),
 });

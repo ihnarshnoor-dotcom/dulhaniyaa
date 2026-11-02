@@ -10,8 +10,9 @@ import { B2BMenu } from "./B2BMenu";
 import { HeaderAuth } from "./HeaderAuth";
 import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
+import { navLinkClasses } from "./navItem";
 
-// The logo already links home.
+// The logo already links home. "Plan my wedding" leads the nav as a solid button; the mobile menu has its own.
 const desktopLinks = headerLinks.filter((link) => link.href !== "/");
 
 export function Header() {
@@ -39,8 +40,15 @@ export function Header() {
 
           <nav
             aria-label="Main"
-            className="hidden items-center gap-7 lg:flex lg:justify-self-center"
+            className="hidden items-center gap-2 lg:flex lg:justify-self-center"
           >
+            <Link
+              href="/plan-my-wedding"
+              aria-current={pathname.startsWith("/plan-my-wedding") ? "page" : undefined}
+              className={buttonClasses("primary", "cta-shine mr-2 min-h-10 px-5 py-2 whitespace-nowrap bg-primary/85! hover:bg-primary!")}
+            >
+              Plan my wedding
+            </Link>
             {desktopLinks.map((link) => {
               const active = pathname.startsWith(link.href);
               return (
@@ -48,9 +56,7 @@ export function Header() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`text-sm tracking-wide transition-colors ${
-                    active ? "text-primary" : "text-muted hover:text-ink"
-                  }`}
+                  className={navLinkClasses(active)}
                 >
                   {link.label}
                 </Link>
@@ -60,15 +66,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2 lg:justify-self-end">
-            <Link
-              href="/plan-my-wedding"
-              className={buttonClasses(
-                "primary",
-                "min-h-10 px-5 py-2 whitespace-nowrap max-sm:hidden!",
-              )}
-            >
-              Plan my wedding
-            </Link>
             <HeaderAuth />
             <button
               type="button"

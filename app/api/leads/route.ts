@@ -8,7 +8,7 @@
  */
 
 /** Forms allowed to write to the sheet. Each name becomes a tab. */
-const FORMS = ["lets-talk", "budget-calculator"] as const;
+const FORMS = ["lets-talk", "budget-calculator", "vendor-qna"] as const;
 export type LeadFormName = (typeof FORMS)[number];
 
 const MAX_KEYS = 30;

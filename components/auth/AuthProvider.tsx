@@ -7,7 +7,7 @@ import { normalizePhone } from "@/lib/authSchemas";
 import { refreshDelay } from "@/lib/authSession";
 import { loginHref } from "@/lib/safeNext";
 
-type RegisterInput = { name: string; email: string; password: string; phone?: string };
+type RegisterInput = { name: string; email: string; password: string; phone: string };
 
 type AuthValue = {
   user: api.User | null;
@@ -137,8 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(
     async ({ name, email, password, phone }: RegisterInput) => {
-      const cleanPhone = phone ? normalizePhone(phone) : "";
-      await api.signup({ name: name.trim(), email: email.trim(), password, ...(cleanPhone && { phone: cleanPhone }) });
+      await api.signup({ name: name.trim(), email: email.trim(), password, phone: normalizePhone(phone.trim()) });
       // Signing up returns no token, so log straight in.
       await login(email, password);
     },

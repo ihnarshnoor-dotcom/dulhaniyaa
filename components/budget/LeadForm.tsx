@@ -32,10 +32,18 @@ type Props = {
   onClose: () => void;
   /** `website` is the hidden honeypot field: empty for real visitors. */
   onSubmit: (contact: Contact, website: string) => void;
+  /** Wording for flows other than the budget calculator. */
+  copy?: { title: string; text: string; submit: string };
+};
+
+const defaultCopy = {
+  title: "One last step",
+  text: "Tell us who you are and we'll unlock your personalised plan. Our planner may call to help you with it.",
+  submit: "Unlock my plan",
 };
 
 /** Details we ask for before running the AI plan. Shown as a popup. */
-export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
+export function LeadForm({ open, sending, failed, onClose, onSubmit, copy = defaultCopy }: Props) {
   const [values, setValues] = useState<Contact>({
     name: "",
     phone: "",
@@ -143,11 +151,10 @@ export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
           <LockKeyhole className="size-6" strokeWidth={1.6} />
         </span>
         <h2 id="lead-title" className="mt-4 text-3xl leading-tight">
-          One last step
+          {copy.title}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Tell us who you are and we&apos;ll unlock your personalised plan. Our
-          planner may call to help you with it.
+          {copy.text}
         </p>
 
         <form noValidate onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -194,7 +201,7 @@ export function LeadForm({ open, sending, failed, onClose, onSubmit }: Props) {
             disabled={sending}
             className={buttonClasses("primary", "w-full disabled:opacity-60")}
           >
-            {sending ? "Sending…" : failed ? "Try again" : "Unlock my plan"}
+            {sending ? "Sending…" : failed ? "Try again" : copy.submit}
           </button>
         </form>
       </div>

@@ -17,7 +17,7 @@ export default function PlanMyWeddingPage() {
           <p className="hero-fade text-xs font-medium tracking-[0.25em] text-primary uppercase">Plan my wedding</p>
           <h1 className="hero-fade mt-3 text-5xl leading-[1.05] [animation-delay:100ms] sm:text-6xl">What will your wedding look like?</h1>
           <p className="hero-fade mx-auto mt-4 max-w-md leading-relaxed text-muted [animation-delay:200ms]">
-            Tap a question and our planner explains each event, what happens and what to plan for.
+            Tap a question or type your own, and our planner explains each event, what happens and what to plan for.
           </p>
         </div>
         <WeddingPlanner />
