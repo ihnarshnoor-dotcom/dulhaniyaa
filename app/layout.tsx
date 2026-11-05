@@ -100,12 +100,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-IN" className={`${cormorant.variable} ${inter.variable} antialiased`}>
       <body className="flex min-h-svh flex-col font-sans">
-        <a
-          href="#main"
-          className="sr-only z-50 rounded-full bg-primary px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
-        >
-          Skip to content
-        </a>
         <AuthProvider>
           {/* The header reads the current path. On routes whose path is only known per request
               (like /s/[token] share links) that has to wait, which needs a Suspense boundary or
