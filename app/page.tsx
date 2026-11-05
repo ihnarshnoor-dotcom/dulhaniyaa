@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { GroupNav } from "@/components/what-we-do/GroupNav";
 import { ScrollEffects } from "@/components/what-we-do/ScrollEffects";
+import { ServiceChip } from "@/components/what-we-do/ServiceChip";
 
 const totalServices = serviceGroups.reduce(
   (sum, g) => sum + g.categories.reduce((n, c) => n + c.items.length, 0),
@@ -135,7 +136,7 @@ export default function HomePage() {
                       <article
                         key={cat.name}
                         data-reveal
-                        className="rounded-3xl border border-ink/10 bg-white/60 p-6 backdrop-blur-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-primary/10 sm:p-7"
+                        className="relative rounded-3xl border border-ink/10 bg-white/60 p-6 backdrop-blur-sm has-[[aria-expanded=true]]:z-10 has-[[aria-expanded=true]]:backdrop-blur-none transition-shadow duration-300 hover:shadow-xl hover:shadow-primary/10 sm:p-7"
                       >
                         <div className="flex items-baseline justify-between gap-4">
                           <h3 className="text-2xl sm:text-3xl">{cat.name}</h3>
@@ -146,12 +147,7 @@ export default function HomePage() {
                         </div>
                         <ul data-stagger className="mt-4 flex flex-wrap gap-2">
                           {cat.items.map((item) => (
-                            <li
-                              key={item}
-                              className="rounded-full border border-ink/10 bg-ivory px-3.5 py-1.5 text-sm text-ink/80 transition-colors hover:border-primary/40 hover:bg-secondary/60 hover:text-primary-dark"
-                            >
-                              {item}
-                            </li>
+                            <ServiceChip key={item.name} {...item} />
                           ))}
                         </ul>
                       </article>
