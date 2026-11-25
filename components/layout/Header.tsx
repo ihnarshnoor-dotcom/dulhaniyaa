@@ -12,7 +12,7 @@ import { Logo } from "./Logo";
 import { MobileMenu } from "./MobileMenu";
 import { navLinkClasses } from "./navItem";
 
-// The logo already links home. "Plan my wedding" leads the nav as a solid button; the mobile menu has its own.
+// The logo already links home. "Plan my event" leads the nav as a solid button; the mobile menu has its own.
 const desktopLinks = headerLinks.filter((link) => link.href !== "/");
 
 export function Header() {
@@ -47,7 +47,7 @@ export function Header() {
               aria-current={pathname.startsWith("/plan-my-wedding") ? "page" : undefined}
               className={buttonClasses("primary", "cta-shine mr-2 min-h-10 px-5 py-2 whitespace-nowrap bg-primary/85! hover:bg-primary!")}
             >
-              Plan my wedding
+              Plan my event
             </Link>
             {desktopLinks.map((link) => {
               const active = pathname.startsWith(link.href);

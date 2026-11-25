@@ -82,7 +82,7 @@ export async function sendLeadEmail(lead: LeadEmail) {
         City: lead.city,
         Guests: lead.guestCount.toLocaleString("en-IN"),
         Budget: lead.budget || "Not decided",
-        "Wedding month": lead.date || "Not decided",
+        "Wedding date": lead.date || "Not decided",
         "Live estimate": lead.estimate,
         [`Services (${lead.services.length})`]: lead.services.join(", "),
       },

@@ -138,14 +138,15 @@ export const business = {
 
 export const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/venue", label: "Venue" },
   { href: "/testimonials", label: "Testimonials" },
-  { href: "/budget-calculator", label: "Wedding Budgetor" },
+  { href: "/budget-calculator", label: "Budget calculator" },
   { href: "/photogram", label: "Photogram" },
   { href: "/community", label: "Community" },
 ];
 
 /** Links in the header and mobile menu. The rest of navLinks still appear in the footer and the sitemap. */
-const hiddenFromHeader = ["/testimonials"];
+const hiddenFromHeader = ["/testimonials", "/venue"];
 export const headerLinks = navLinks.filter(
   (link) => !hiddenFromHeader.includes(link.href),
 );
