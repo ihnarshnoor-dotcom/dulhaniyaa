@@ -221,7 +221,7 @@ export function WeddingPlanner() {
               <span className="font-medium text-ink">{added.join(" · ")}</span>
             </>
           ) : (
-            "Ready for prices? Add events as you go, or pick them in the Wedding Budgetor."
+            "Ready for prices? Add events as you go, or pick them in the budget calculator."
           )}
         </p>
         <button

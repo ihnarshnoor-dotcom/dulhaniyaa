@@ -89,7 +89,7 @@ export function MobileMenu({ open, onClose, pathname }: Props) {
       <div style={delay(open, headerLinks.length + 1)} className={`flex flex-col gap-3 px-6 pb-10 ${item(open)}`}>
         <MobileAuth onNavigate={onClose} />
         <Link href="/plan-my-wedding" onNavigate={onClose} className={buttonClasses("primary")}>
-          Plan my wedding
+          Plan my event
         </Link>
         <div className="grid grid-cols-2 gap-3">
           <a

@@ -88,45 +88,75 @@ export function upcomingMonths(from = new Date()) {
     return {
       value: d.toLocaleString("en-IN", { month: "long", year: "numeric" }),
       month: d.toLocaleString("en-IN", { month: "short" }),
+      monthIndex: d.getMonth(),
       year: d.getFullYear(),
     };
   });
 }
 
+/** A picked day as "14 February 2027"; ends with the month's value so the month can be read back. */
+export function formatDay(year: number, monthIndex: number, day: number) {
+  return new Date(year, monthIndex, day).toLocaleString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 /**
- * Each vibe pre-selects every core item plus the first N items of the other
- * levels in each category (the rate card lists the popular ones first).
+ * Quick picks on the services step. Each one selects every core item plus the first N items of the
+ * other levels in each category (the rate card lists the popular ones first).
  * Keep the totals under MAX_SERVICES so customers have room to fine-tune.
+ */
+export const servicePresets: {
+  label: string;
+  perCategory: Partial<Record<Level, number>>;
+}[] = [
+  { label: "Just the essentials", perCategory: { core: Infinity } },
+  { label: "Essentials + popular extras", perCategory: { core: Infinity, addon: 1 } },
+  { label: "The works", perCategory: { core: Infinity, addon: 1, luxury: 1 } },
+];
+
+/** Which slice of each service's price range a vibe uses: 0 = the low end, 1 = the high end. */
+export type PriceBand = readonly [number, number];
+export const FULL_RANGE: PriceBand = [0, 1];
+
+/**
+ * The vibe sets the price level for the services already picked: the same services cost more
+ * at a higher vibe (better vendors, richer finishes). Bands should run low to high without gaps.
  */
 export const vibeOptions: {
   id: string;
   name: string;
   icon: LucideIcon;
   note: string;
-  perCategory: Partial<Record<Level, number>>;
+  band: PriceBand;
 }[] = [
   {
     id: "essential",
     name: "Essential",
     icon: Flower2,
-    note: "Everything you need, beautifully done",
-    perCategory: { core: Infinity },
+    note: "Trusted vendors and smart choices, beautifully done",
+    band: [0, 0.35],
   },
   {
     id: "elevated",
     name: "Elevated",
     icon: Sparkles,
-    note: "The essentials plus crowd-pleasing extras",
-    perCategory: { core: Infinity, addon: 1 },
+    note: "Premium vendors and richer finishes",
+    band: [0.35, 0.7],
   },
   {
     id: "royal",
     name: "Royal",
     icon: Crown,
-    note: "Extras plus a luxury upgrade everywhere",
-    perCategory: { core: Infinity, addon: 1, luxury: 1 },
+    note: "The very best of every service, no compromises",
+    band: [0.7, 1],
   },
 ];
+
+export const findVibe = (id: string | null) =>
+  vibeOptions.find((v) => v.id === id) ?? null;
 
 export const levelLabels: Record<Level, string> = {
   core: "The essentials",
@@ -144,8 +174,8 @@ export const pricingLabels: Record<PricingType, string> = {
 
 /* ───────────── Helpers ───────────── */
 
-/** Ids a vibe pre-selects. On-request items are left for the customer to opt into. */
-export function idsForVibe(
+/** Ids a quick pick selects. On-request items are left for the customer to opt into. */
+export function idsForPreset(
   card: RateCard,
   perCategory: Partial<Record<Level, number>>,
 ) {
@@ -173,6 +203,7 @@ export function estimate(
   selected: Set<string>,
   guestCount: number,
   eventCount: number,
+  band: PriceBand = FULL_RANGE,
 ) {
   let min = 0;
   let max = 0;
@@ -189,11 +220,41 @@ export function estimate(
         continue;
       }
       const qty = multiplier(item, guestCount, eventCount);
-      min += item.min * qty;
-      max += item.max * qty;
+      min += pointInRange(item.min, item.max, band[0]) * qty;
+      max += pointInRange(item.min, item.max, band[1]) * qty;
     }
   }
   return { min, max, onRequest };
+}
+
+const pointInRange = (min: number, max: number, f: number) => min + (max - min) * f;
+
+/**
+ * Prices the AI's plan at the chosen vibe: every low–high pair (items, subtotals, total) is narrowed to
+ * the vibe's slice of that range, so the plan matches the estimate the customer saw.
+ */
+export function atVibe(plan: Plan, band: PriceBand): Plan {
+  const narrow = <T extends Record<string, unknown>>(o: T, minKey: keyof T, maxKey: keyof T): T => {
+    const lo = o[minKey];
+    const hi = o[maxKey];
+    if (typeof lo !== "number" || typeof hi !== "number") return o;
+    return {
+      ...o,
+      [minKey]: Math.round(pointInRange(lo, hi, band[0]) / 100) * 100,
+      [maxKey]: Math.round(pointInRange(lo, hi, band[1]) / 100) * 100,
+    };
+  };
+  return narrow(
+    {
+      ...plan,
+      categories: plan.categories?.map((c) => ({
+        ...narrow(c, "subtotal_min", "subtotal_max"),
+        items: c.items.map((i) => narrow(i, "est_min", "est_max")),
+      })),
+    },
+    "total_min",
+    "total_max",
+  );
 }
 
 function multiplier(item: ServiceItem, guestCount: number, eventCount: number) {

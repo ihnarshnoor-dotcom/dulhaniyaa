@@ -36,12 +36,15 @@ export function PlanResult({
   plan,
   basics,
   customerName,
+  vibe,
   onEdit,
   onRestart,
 }: {
   plan: Plan;
   basics: Basics;
   customerName?: string;
+  /** The vibe the prices were set at, e.g. "Elevated". */
+  vibe?: string;
   onEdit: () => void;
   onRestart: () => void;
 }) {
@@ -55,6 +58,7 @@ export function PlanResult({
     basics.city,
     `${basics.guestCount.toLocaleString("en-IN")} guests`,
     basics.date,
+    vibe && `${vibe} vibe`,
   ].filter(Boolean);
 
   return (

@@ -13,12 +13,13 @@ import {
   estimate,
   eventOptions,
   eventPresets,
+  formatDay,
   guestOptions,
-  idsForVibe,
-  inr,
+  idsForPreset,
   inrRange,
   levelLabels,
   pricingLabels,
+  servicePresets,
   upcomingMonths,
   vibeOptions,
 } from "@/lib/budget";
@@ -227,9 +228,28 @@ export function GuestsStep({
   const clamp = (n: number) => Math.min(MAX_GUESTS, Math.max(MIN_GUESTS, n));
   const step = guests != null && guests >= 500 ? 50 : 25;
 
+  // What's in the box while typing; re-synced whenever guests changes from a card or the −/+ buttons.
+  const [text, setText] = useState(guests != null ? String(guests) : "");
+  const [synced, setSynced] = useState(guests);
+  if (guests !== synced) {
+    setSynced(guests);
+    setText(guests != null ? String(guests) : "");
+  }
+
+  const type = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 5);
+    setText(digits);
+    const n = Number.parseInt(digits, 10);
+    if (n >= MIN_GUESTS) {
+      const next = clamp(n);
+      setSynced(next);
+      onChange(next);
+    }
+  };
+
   return (
     <>
-      <StepTitle title="How big is the guest list?" hint="Pick the closest, then fine-tune if you like" />
+      <StepTitle title="How big is the guest list?" hint="Pick the closest or type your own number" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {guestOptions.map((o) => (
           <OptionCard key={o.label} selected={guests === o.value} onClick={() => onChange(o.value)}>
@@ -240,32 +260,39 @@ export function GuestsStep({
         ))}
       </div>
 
-      {guests != null && (
-        <div className="step-in mt-6 flex items-center justify-center gap-4">
-          <button
-            type="button"
-            aria-label={`${step} fewer guests`}
-            onClick={() => onChange(clamp(guests - step))}
-            disabled={guests <= MIN_GUESTS}
-            className="grid size-12 place-items-center rounded-full border border-ink/15 bg-white/70 text-xl backdrop-blur-sm hover:border-primary disabled:opacity-40"
-          >
-            −
-          </button>
-          <p className="min-w-32 text-center" aria-live="polite">
-            <span className="block font-serif text-4xl">{guests.toLocaleString("en-IN")}</span>
-            <span className="text-xs text-muted">guests</span>
-          </p>
-          <button
-            type="button"
-            aria-label={`${step} more guests`}
-            onClick={() => onChange(clamp(guests + step))}
-            disabled={guests >= MAX_GUESTS}
-            className="grid size-12 place-items-center rounded-full border border-ink/15 bg-white/70 text-xl backdrop-blur-sm hover:border-primary disabled:opacity-40"
-          >
-            +
-          </button>
-        </div>
-      )}
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <button
+          type="button"
+          aria-label={`${step} fewer guests`}
+          onClick={() => guests != null && onChange(clamp(guests - step))}
+          disabled={guests == null || guests <= MIN_GUESTS}
+          className="grid size-12 place-items-center rounded-full border border-ink/15 bg-white/70 text-xl backdrop-blur-sm hover:border-primary disabled:opacity-40"
+        >
+          −
+        </button>
+        <label className="min-w-32 text-center">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={text}
+            onChange={(e) => type(e.target.value)}
+            onBlur={() => setText(guests != null ? String(guests) : "")}
+            placeholder="Type"
+            aria-label={`Number of guests, ${MIN_GUESTS} to ${MAX_GUESTS.toLocaleString("en-IN")}`}
+            className="w-32 border-b border-ink/15 bg-transparent text-center font-serif text-4xl outline-none placeholder:text-ink/30 focus:border-primary"
+          />
+          <span className="mt-1 block text-xs text-muted">guests (up to {MAX_GUESTS.toLocaleString("en-IN")})</span>
+        </label>
+        <button
+          type="button"
+          aria-label={`${step} more guests`}
+          onClick={() => onChange(guests == null ? guestOptions[0].value : clamp(guests + step))}
+          disabled={guests != null && guests >= MAX_GUESTS}
+          className="grid size-12 place-items-center rounded-full border border-ink/15 bg-white/70 text-xl backdrop-blur-sm hover:border-primary disabled:opacity-40"
+        >
+          +
+        </button>
+      </div>
 
       <ContinueButton onClick={onNext} disabled={guests == null}>
         Continue
@@ -299,15 +326,80 @@ export function BudgetStep({ budget, onPick }: { budget: string | null; onPick: 
 
 /* ───────────── 5. Date ───────────── */
 
+const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+/** Pick a month, then a day in it (or keep the whole month if the day isn't fixed). */
 export function DateStep({ date, onPick }: { date: string | null; onPick: (d: string) => void }) {
   const [months] = useState(() => upcomingMonths());
+  const [today] = useState(() => new Date());
+  // A saved date ("14 February 2027") or month ("February 2027") ends with its month's value.
+  const [month, setMonth] = useState(() => (date ? (months.find((m) => date.endsWith(m.value)) ?? null) : null));
+
+  if (month) {
+    const daysInMonth = new Date(month.year, month.monthIndex + 1, 0).getDate();
+    const leadingBlanks = (new Date(month.year, month.monthIndex, 1).getDay() + 6) % 7; // Monday first
+    const isThisMonth = month.year === today.getFullYear() && month.monthIndex === today.getMonth();
+
+    return (
+      <>
+        <StepTitle title={`Which day in ${month.value.split(" ")[0]}?`} hint="Tap the date, or keep the whole month open" />
+        <div className="mx-auto max-w-md rounded-2xl border border-ink/10 bg-white/60 p-4 backdrop-blur-sm sm:p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <button type="button" onClick={() => setMonth(null)} className="text-sm font-medium text-muted hover:text-ink">
+              ← Months
+            </button>
+            <span className="font-serif text-xl">{month.value}</span>
+            <span className="w-16" aria-hidden />
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted" aria-hidden>
+            {weekdays.map((d) => (
+              <span key={d} className="py-1">
+                {d}
+              </span>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {Array.from({ length: leadingBlanks }, (_, i) => (
+              <span key={`blank-${i}`} />
+            ))}
+            {Array.from({ length: daysInMonth }, (_, i) => {
+              const day = i + 1;
+              const value = formatDay(month.year, month.monthIndex, day);
+              const past = isThisMonth && day < today.getDate();
+              const picked = date === value;
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  disabled={past}
+                  onClick={() => onPick(value)}
+                  aria-pressed={picked}
+                  aria-label={value}
+                  className={`aspect-square rounded-full text-sm transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-30 ${
+                    picked ? "bg-primary font-medium text-white shadow-md shadow-primary/20" : "hover:bg-secondary/70 hover:text-primary"
+                  }`}
+                >
+                  {day}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div className="mt-4 flex justify-center">
+          <OptionChip selected={date === month.value} onClick={() => onPick(month.value)}>
+            Any day in {month.value.split(" ")[0]}
+          </OptionChip>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
-      <StepTitle title="When's the big day?" hint="Just the month is perfect" />
+      <StepTitle title="When's the big day?" hint="Pick the month, then the date" />
       <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
         {months.map((m) => (
-          <OptionCard key={m.value} selected={date === m.value} onClick={() => onPick(m.value)} className="text-center">
+          <OptionCard key={m.value} selected={!!date && date.endsWith(m.value)} onClick={() => setMonth(m)} className="text-center">
             <span className="block font-serif text-2xl">{m.month}</span>
             <span className="block text-xs text-muted">{m.year}</span>
           </OptionCard>
@@ -322,60 +414,49 @@ export function DateStep({ date, onPick }: { date: string | null; onPick: (d: st
   );
 }
 
-/* ───────────── 6. Vibe ───────────── */
+/* ───────────── 7. Vibe ───────────── */
 
+/** Same services at every vibe; the vibe sets how far up each service's price range we go. */
 export function VibeStep({
   card,
-  cardError,
-  onRetry,
+  selected,
   vibe,
   guests,
   eventCount,
   onPick,
 }: {
-  card: RateCard | null;
-  cardError: boolean;
-  onRetry: () => void;
+  card: RateCard;
+  selected: Set<string>;
   vibe: string | null;
   guests: number;
   eventCount: number;
-  onPick: (id: string, ids: string[]) => void;
+  onPick: (id: string) => void;
 }) {
   return (
     <>
-      <StepTitle title="Pick your vibe" hint="We'll pre-select services to match. You can fine-tune next." />
-      {cardError ? (
-        <LoadError onRetry={onRetry} />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-3">
-          {vibeOptions.map((v) => {
-            const ids = card ? idsForVibe(card, v.perCategory) : [];
-            const est = card ? estimate(card, new Set(ids), guests, eventCount) : null;
-            return (
-              <OptionCard
-                key={v.id}
-                selected={vibe === v.id}
-                onClick={() => card && onPick(v.id, ids)}
-                className={`p-6 text-center ${card ? "" : "pointer-events-none"}`}
-              >
-                <span className="flex justify-center">
-                  <IconBadge icon={v.icon} active={vibe === v.id} large />
-                </span>
-                <span className="mt-3 block font-serif text-3xl">{v.name}</span>
-                <span className="mt-1 block text-sm text-muted">{v.note}</span>
-                {est ? (
-                  <span className="mt-4 block text-sm font-medium text-primary">
-                    from {inr(est.min)}
-                    <span className="block text-xs font-normal text-muted">{ids.length} services</span>
-                  </span>
-                ) : (
-                  <span className="shimmer mx-auto mt-4 block h-9 w-32 rounded-lg" />
-                )}
-              </OptionCard>
-            );
-          })}
-        </div>
-      )}
+      <StepTitle
+        title="Pick your vibe"
+        hint={`Same ${selected.size} services, priced at the level you want`}
+      />
+      <div className="grid gap-4 sm:grid-cols-3">
+        {vibeOptions.map((v, i) => {
+          const est = estimate(card, selected, guests, eventCount, v.band);
+          return (
+            <OptionCard key={v.id} selected={vibe === v.id} onClick={() => onPick(v.id)} className="p-6 text-center">
+              <span className="flex justify-center">
+                <IconBadge icon={v.icon} active={vibe === v.id} large />
+              </span>
+              <span className="mt-3 block font-serif text-3xl">{v.name}</span>
+              <span className="mt-1 block text-sm text-muted">{v.note}</span>
+              <span className="mt-4 block text-xs tracking-widest text-muted" aria-hidden>
+                {"₹".repeat(i + 1)}
+              </span>
+              <span className="mt-1 block text-sm font-medium text-primary">{inrRange(est.min, est.max)}</span>
+              {est.onRequest > 0 && <span className="block text-xs text-muted">+{est.onRequest} on request</span>}
+            </OptionCard>
+          );
+        })}
+      </div>
     </>
   );
 }
@@ -391,16 +472,20 @@ export function LoadError({ onRetry, message }: { onRetry: () => void; message?:
   );
 }
 
-/* ───────────── 7. Fine-tune services ───────────── */
+/* ───────────── 6. Services ───────────── */
 
 export function ServicesStep({
   card,
   selected,
   onToggle,
+  onReplace,
+  onNext,
 }: {
   card: RateCard;
   selected: Set<string>;
   onToggle: (id: string) => void;
+  onReplace: (ids: string[]) => void;
+  onNext: () => void;
 }) {
   const [active, setActive] = useState(0);
   const full = selected.size >= MAX_SERVICES;
@@ -409,7 +494,24 @@ export function ServicesStep({
 
   return (
     <>
-      <StepTitle title="Fine-tune your services" hint="Tap to add or remove. Your live estimate updates below." />
+      <StepTitle title="Which services do you need?" hint="Start from a quick pick or tap to add and remove. Next, you'll pick the vibe." />
+
+      <div className="mb-4 flex flex-wrap justify-center gap-2">
+        {servicePresets.map((p) => {
+          const ids = idsForPreset(card, p.perCategory);
+          const on = ids.length === selected.size && ids.every((id) => selected.has(id));
+          return (
+            <OptionChip key={p.label} selected={on} onClick={() => onReplace(ids)}>
+              {p.label}
+            </OptionChip>
+          );
+        })}
+        {selected.size > 0 && (
+          <button type="button" onClick={() => onReplace([])} className="px-3 text-sm text-muted hover:text-ink">
+            Clear
+          </button>
+        )}
+      </div>
 
       <p className={`-mt-3 mb-5 text-center text-xs ${full ? "font-medium text-primary" : "text-muted"}`} aria-live="polite">
         {selected.size} / {MAX_SERVICES} services picked
@@ -502,6 +604,10 @@ export function ServicesStep({
           {card.categories[active + 1]?.name} →
         </button>
       </div>
+
+      <ContinueButton onClick={onNext} disabled={selected.size === 0}>
+        {selected.size === 0 ? "Pick at least one service" : `Continue with ${selected.size} service${selected.size > 1 ? "s" : ""}`}
+      </ContinueButton>
     </>
   );
 }

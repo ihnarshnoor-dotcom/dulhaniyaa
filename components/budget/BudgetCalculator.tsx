@@ -14,8 +14,10 @@ import {
   MAX_GUESTS,
   MAX_SERVICES,
   MIN_GUESTS,
+  atVibe,
   budgetOptions,
   estimate,
+  findVibe,
   inrRange,
   withReadableNames,
 } from "@/lib/budget";
@@ -53,11 +55,13 @@ const steps = [
   { id: "guests", label: "Guests", icon: Users },
   { id: "budget", label: "Budget", icon: Wallet },
   { id: "date", label: "Date", icon: CalendarDays },
-  { id: "vibe", label: "Vibe", icon: Sparkles },
   { id: "services", label: "Services", icon: ListChecks },
+  { id: "vibe", label: "Vibe", icon: Sparkles },
 ] as const;
 
-const SERVICES_STEP = steps.length - 1;
+// Pick the services first, then the vibe prices those same services (see vibeOptions in lib/budget.ts).
+const SERVICES_STEP = 5;
+const VIBE_STEP = steps.length - 1;
 
 type Phase = "build" | "loading" | "result" | "error";
 
@@ -138,12 +142,12 @@ export function BudgetCalculator() {
 
   const goTo = (i: number) => {
     clearTimeout(advanceTimer.current);
-    setStep(Math.max(0, Math.min(SERVICES_STEP, i)));
+    setStep(Math.max(0, Math.min(VIBE_STEP, i)));
   };
   // Single-choice steps move on by themselves after a short beat.
   const advanceSoon = () => {
     clearTimeout(advanceTimer.current);
-    advanceTimer.current = setTimeout(() => setStep((s) => Math.min(SERVICES_STEP, s + 1)), 280);
+    advanceTimer.current = setTimeout(() => setStep((s) => Math.min(VIBE_STEP, s + 1)), 280);
   };
 
   const toggleItem = (id: string) =>
@@ -154,7 +158,9 @@ export function BudgetCalculator() {
       return next;
     });
 
-  const live = card && guests ? estimate(card, selected, guests, events.length) : null;
+  const chosenVibe = findVibe(vibe);
+  // Before a vibe is picked the estimate spans every price level; after, it's that vibe's slice.
+  const live = card && guests ? estimate(card, selected, guests, events.length, chosenVibe?.band) : null;
 
   // The facilitator doesn't validate, so we do.
   const basics: Basics | null =
@@ -167,7 +173,7 @@ export function BudgetCalculator() {
           ...(date ? { date } : {}),
         }
       : null;
-  const canSubmit = basics != null && selected.size > 0 && selected.size <= MAX_SERVICES;
+  const canSubmit = basics != null && chosenVibe != null && selected.size > 0 && selected.size <= MAX_SERVICES;
 
   async function submit() {
     if (!canSubmit || requesting.current) return;
@@ -176,7 +182,8 @@ export function BudgetCalculator() {
     setPhase("loading");
     try {
       const result = await getPlan(basics, [...selected]);
-      setPlan(card ? withReadableNames(result, card) : result);
+      const named = card ? withReadableNames(result, card) : result;
+      setPlan(chosenVibe ? atVibe(named, chosenVibe.band) : named);
       setPhase("result");
     } catch (err) {
       setPlanError(err instanceof FacilitatorError && err.message === "NETWORK" ? "NETWORK" : "SERVER");
@@ -197,8 +204,8 @@ export function BudgetCalculator() {
   }
 
   async function sendDetails(details: Contact, website = "") {
-    if (!basics || !card || leadSending) return;
-    const totals = estimate(card, selected, basics.guestCount, basics.events.length);
+    if (!basics || !card || !chosenVibe || leadSending) return;
+    const totals = estimate(card, selected, basics.guestCount, basics.events.length, chosenVibe.band);
     const services = card.categories.flatMap((c) =>
       c.items.filter((i) => selected.has(i.id)).map((i) => `${i.name} (${c.name})`),
     );
@@ -208,7 +215,7 @@ export function BudgetCalculator() {
       ...details,
       ...basics,
       services,
-      estimate: `${inrRange(totals.min, totals.max) ?? "-"}${totals.onRequest ? ` + ${totals.onRequest} on request` : ""}`,
+      estimate: `${chosenVibe.name}: ${inrRange(totals.min, totals.max) ?? "-"}${totals.onRequest ? ` + ${totals.onRequest} on request` : ""}`,
     };
     try {
       await sendLeadEmail(lead);
@@ -356,24 +363,30 @@ export function BudgetCalculator() {
                   }}
                 />
               )}
-              {step === 5 && (
-                <VibeStep
-                  card={card}
-                  cardError={cardError}
-                  onRetry={retryCard}
-                  vibe={vibe}
-                  guests={guests ?? MIN_GUESTS}
-                  eventCount={events.length}
-                  onPick={(id, ids) => {
-                    setVibe(id);
-                    setSelected(new Set(ids));
-                    advanceSoon();
-                  }}
-                />
-              )}
-              {step === 6 &&
+              {step === SERVICES_STEP &&
                 (card ? (
-                  <ServicesStep card={card} selected={selected} onToggle={toggleItem} />
+                  <ServicesStep
+                    card={card}
+                    selected={selected}
+                    onToggle={toggleItem}
+                    onReplace={(ids) => setSelected(new Set(ids))}
+                    onNext={() => goTo(VIBE_STEP)}
+                  />
+                ) : cardError ? (
+                  <LoadError onRetry={retryCard} />
+                ) : (
+                  <div className="shimmer h-64 rounded-2xl" />
+                ))}
+              {step === VIBE_STEP &&
+                (card ? (
+                  <VibeStep
+                    card={card}
+                    selected={selected}
+                    vibe={vibe}
+                    guests={guests ?? MIN_GUESTS}
+                    eventCount={events.length}
+                    onPick={setVibe}
+                  />
                 ) : cardError ? (
                   <LoadError onRetry={retryCard} />
                 ) : (
@@ -382,17 +395,19 @@ export function BudgetCalculator() {
             </div>
 
             {/* Live estimate + final call to action */}
-            {step >= 5 && live && selected.size > 0 && (
+            {step >= SERVICES_STEP && live && selected.size > 0 && (
               <div className="sticky bottom-4 z-10 mt-8">
                 <div className="flex flex-col items-center gap-3 rounded-3xl bg-ink/90 p-4 text-white shadow-xl backdrop-blur-md sm:flex-row sm:justify-between sm:rounded-full sm:py-3 sm:pr-3 sm:pl-6">
                   <p className="text-center sm:text-left" aria-live="polite">
-                    <span className="block text-[11px] tracking-widest text-white/60 uppercase">Live estimate</span>
+                    <span className="block text-[11px] tracking-widest text-white/60 uppercase">
+                      {chosenVibe ? `Live estimate · ${chosenVibe.name}` : "Live estimate · all price levels"}
+                    </span>
                     <span className="font-serif text-xl sm:text-2xl">{inrRange(live.min, live.max)}</span>
                     <span className="ml-2 text-xs text-white/60">
                       {selected.size} services{live.onRequest > 0 && ` · +${live.onRequest} on request`}
                     </span>
                   </p>
-                  {step === SERVICES_STEP && (
+                  {step === VIBE_STEP && (
                     <button
                       type="button"
                       onClick={reveal}
@@ -408,8 +423,8 @@ export function BudgetCalculator() {
                 </div>
               </div>
             )}
-            {step === SERVICES_STEP && card && selected.size === 0 && (
-              <p className="mt-6 text-center text-sm text-muted">Pick at least one service to see your plan.</p>
+            {step === VIBE_STEP && card && selected.size > 0 && !chosenVibe && (
+              <p className="mt-6 text-center text-sm text-muted">Pick a vibe to see your plan.</p>
             )}
           </>
         )}
@@ -439,8 +454,9 @@ export function BudgetCalculator() {
             plan={plan}
             customerName={contact?.name}
             basics={sentBasics}
+            vibe={chosenVibe?.name}
             onEdit={() => {
-              setStep(SERVICES_STEP);
+              setStep(VIBE_STEP);
               setPhase("build");
             }}
             onRestart={restart}
